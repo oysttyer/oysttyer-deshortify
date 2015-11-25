@@ -220,7 +220,7 @@ $cleanup_url = sub{
 $unshort = sub{
 	our $verbose;
 	our $superverbose;
-	our $TTYtter_VERSION;
+	our $oysttyer_VERSION;
 # 	our $deshortify_cache;
 	our $store;
 	my $url = shift;
@@ -631,7 +631,7 @@ $unshort = sub{
 		# Get the HTTP user agent ready.
 		my $ua = LWP::UserAgent->new;
 		$ua->max_redirect( 0 );	# Don't redirect, just return the headers and look for a "Location:" one manually.
-		$ua->agent( "oysttyer $TTYtter_VERSION URL de-shortifier (" . $ua->agent() . ") (+https://github.com/oysttyer)" ); # Be good net citizens and say how nerdy we are and that we're a bot
+		$ua->agent( "oysttyer $oysttyer_VERSION URL de-shortifier (" . $ua->agent() . ") (+https://github.com/oysttyer)" ); # Be good net citizens and say how nerdy we are and that we're a bot
 
 		if ($extpref_deshortifyproxy) {	# If there's a proxy configured in .ttytterrc, use it no matter what.
 			$ua->proxy([qw/ http https /] => $extpref_deshortifyproxy);
