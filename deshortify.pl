@@ -468,6 +468,7 @@ $unshort = sub{
 	    ($auth eq "thkpr.gs")	or	# ThinkProgress.org
 	    ($auth eq "twurl.nl")	or
 	    ($auth eq "w.abc.es")	or
+	    ($auth eq "wired.uk")	or
 	    ($auth eq "ymlp.com")	or
 #	    ($auth eq "youtu.be")	or	# This one is actually useful: no information is gained by de-shortening.
 	    ($auth eq "1.usa.gov")	or	# USA
@@ -492,14 +493,18 @@ $unshort = sub{
 	    ($auth eq "feedly.com")	or
 	    ($auth eq "go.usa.gov")	or
 	    ($auth eq "macrumo.rs")	or	# Mac Rumors
+	    ($auth eq "mitsmr.com")	or
 	    ($auth eq "oak.ctx.ly")	or
 	    ($auth eq "on.io9.com")	or	# IO9
 	    ($auth eq "on.mash.to")	or	# Mashable
 	    ($auth eq "on.wsj.com")	or	# Wall Street Journal
+	    ($auth eq "recode.net")	or	($auth eq "on.recode.net")	or
 	    ($auth eq "theatln.tc")	or	# The Atlantic
 	    ($auth eq "to.pbs.org")	or	# PBS
 	    ($auth eq "esriurl.com")	or	# ESRI
 	    ($auth eq "go.nasa.gov")	or	# NASA
+	    ($auth eq "GovAlert.eu")	or
+	    ($auth eq "hackaday.com")	or
 	    ($auth eq "tinyurl.com")	or
 	    ($auth eq "trackurl.it")	or
 	    ($auth eq "r.spruse.com")	or	# Powered by bit.ly
