@@ -446,6 +446,7 @@ $unshort = sub{
 	    ($auth eq "menea.me")	or	# Menéame
 	    ($auth eq "mhoff.me")	or
 	    ($auth eq "migre.me")	or
+	    ($auth eq "mobro.co")	or	# Movember
 	    ($auth eq "mslnk.bz")	or
 	    ($auth eq "nokia.ly")	or
 	    ($auth eq "on.fb.me")	or
@@ -468,6 +469,7 @@ $unshort = sub{
 	    ($auth eq "tbbhd.me")	or	# Powered by bit.ly
 	    ($auth eq "tmblr.co")	or	# Tumblr
 	    ($auth eq "thkpr.gs")	or	# ThinkProgress.org
+	    ($auth eq "thndr.me")	or	($auth eq "www.thunderclap.it") or
 	    ($auth eq "twurl.nl")	or
 	    ($auth eq "w.abc.es")	or
 	    ($auth eq "wired.uk")	or
