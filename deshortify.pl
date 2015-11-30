@@ -358,6 +358,7 @@ $unshort = sub{
 	    ($auth eq "amba.to")	or	# Ameba.jp
 	    ($auth eq "amzn.to")	or	# Amazon.com
 	    ($auth eq "apne.ws")	or	# AP news
+	    ($auth eq "arcg.is")	or	# ESRI's ArgCIS online
 	    ($auth eq "buff.ly")	or
 	    ($auth eq "buzz.mw")	or
 	    ($auth eq "chzb.gr")	or	# Cheezburguer network
