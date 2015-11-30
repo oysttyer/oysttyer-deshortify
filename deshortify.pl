@@ -351,7 +351,8 @@ $unshort = sub{
 	    ($auth eq "ur1.ca")	or
 	    ($auth eq "vsb.li")	or
 	    ($auth eq "vsb.ly")	or
-        ($auth eq "wh.gov") or  # Whitehouse.gov
+	    ($auth eq "wef.ch")	or	# WeForum
+	    ($auth eq "wh.gov") or	# Whitehouse.gov
 	    ($auth eq "29g.us")	or
 	    ($auth eq "6sen.se")	or
 	    ($auth eq "amba.to")	or	# Ameba.jp
@@ -360,7 +361,7 @@ $unshort = sub{
 	    ($auth eq "buff.ly")	or
 	    ($auth eq "buzz.mw")	or
 	    ($auth eq "chzb.gr")	or	# Cheezburguer network
-        ($auth eq "clic.bz")    or  # Powered by bit.ly
+	    ($auth eq "clic.bz")    or  # Powered by bit.ly
 	    ($auth eq "cnet.co")	or	# C-Net
 	    ($auth eq "cort.as")	or
 	    ($auth eq "cutv.ws")	or	# cultureunplugged.com
@@ -386,11 +387,12 @@ $unshort = sub{
         ($auth eq "mirr.im")    or  # The Daily Mirror (UK newspaper)
 	    ($auth eq "monk.ly")	or
 	    ($auth eq "mrkt.ms")	or	# MarketMeSuite (SEO platform)
+	    ($auth eq "msft.it")	or	# Microsoft
 	    ($auth eq "nblo.gs")	or	# Networked Blogs
 	    ($auth eq "neow.in")	or	# NeoWin
 	    ($auth eq "note.io")	or
 	    ($auth eq "noti.ca")	or
-        ($auth eq "nyti.ms")    or  # New York Times
+	    ($auth eq "nyti.ms")    or  # New York Times
 	    ($auth eq "nzzl.me")	or
 	    ($auth eq "pear.ly")	or
 	    ($auth eq "post.ly")	or	# Posterous
@@ -434,7 +436,7 @@ $unshort = sub{
 	    ($auth eq "egent.me")	or
 	    ($auth eq "elsab.me")	or
 # 	    ($auth eq "enwp.org")	or	# English Wikipedia. Not really worth deshortening.
-        ($auth eq "flpbd.it")   or  # Flipboard
+	    ($auth eq "flpbd.it")   or  # Flipboard
 	    ($auth eq "gizmo.do")	or	# Gizmodo
 	    ($auth eq "linkd.in")	or	# LinkedIn
 	    ($auth eq "l.r-g.me")	or	# Powered by bit.ly
@@ -474,7 +476,7 @@ $unshort = sub{
 	    ($auth eq "1.usa.gov")	or	# USA
 	    ($auth eq "binged.it")	or	# Microsoft goes Bing!. Bing!
 	    ($auth eq "bitly.com")	or
-        ($auth eq "drudge.tw")  or
+	    ($auth eq "drudge.tw")  or
 	    ($auth eq "keruff.it")	or
 	    ($auth eq "mktfan.es")	or
 	    ($auth eq "m.safe.mn")	or
@@ -486,8 +488,8 @@ $unshort = sub{
 	    ($auth eq "thebea.st")	or	# The Daily Beast
 	    ($auth eq "urlads.co")	or	
 	    ($auth eq "wlstrm.me")	or	# Jeff Walstrom
-        ($auth eq "wwhts.com")  or  # WWWhatsNew, powered by bit.ly
-        ($auth eq "dnlchw.net") or
+	    ($auth eq "wwhts.com")  or  # WWWhatsNew, powered by bit.ly
+	    ($auth eq "dnlchw.net") or
 	    ($auth eq "eepurl.com")	or
 	    ($auth eq "elconfi.de")	or	# El Confidencial (spanish newspaper)
 	    ($auth eq "feedly.com")	or
@@ -528,7 +530,8 @@ $unshort = sub{
 	    ($query =~ m#utm_source=# )	or	# Any URL from *any* server which contains "utm_source=" looks like a social SEO marketing campaign-speech-enabled linkification
 	    ($query =~ m#utm_medium=# )	or	# Any URL from *any* server which contains "utm_medium=" looks like a social SEO marketing campaign-speech-enabled linkification
 	    ($query =~ m#url=http# )	or	# Any URL from *any* server which contains "url=http" looks like a redirector
-	    ($auth eq "www.guardian.co.uk" and $path =~ m#^/p/# )	# Guardian short links, e.g. http://www.guardian.co.uk/p/3fz77/tw
+	    ($auth eq "www.guardian.co.uk" and $path =~ m#^/p/# )	or	# Guardian short links, e.g. http://www.guardian.co.uk/p/3fz77/tw
+	    ($auth eq "www.eldiario.es" and $path =~ m#^/_# )	# ElDiario short links, e.g. www.eldiario.es/_1b3454af
 	    )
 	{
 		$unshorting_method = "HEAD";	# For these servers, perform a HTTP HEAD request
@@ -579,6 +582,7 @@ $unshort = sub{
 	{
 		# Skip some well-known servers that are better to be left shortened.
 		if (
+			(not $auth =~ m#twitter.com$#) and	# Redirects to login and so on
 			(not $auth eq "youtu.be") and	# Full link doesn't add any info
 			(not $auth eq "spoti.fi") and	# Full link doesn't add any info
 			(not $auth eq "4sq.com") and	# Full link doesn't add any info
