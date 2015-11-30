@@ -488,7 +488,8 @@ $unshort = sub{
 	    ($auth eq "pocket.co")	or	($auth eq "getpocket.com" and $path =~ m#^/s#)	or	# GetPocket, also known as ReadItLater
 	    ($auth eq "politi.co")	or	# Politico.com newspaper
 	    ($auth eq "thebea.st")	or	# The Daily Beast
-	    ($auth eq "urlads.co")	or	
+	    ($auth eq "urlads.co")	or
+	    ($auth eq "washin.st")	or	# Washington institute
 	    ($auth eq "wlstrm.me")	or	# Jeff Walstrom
 	    ($auth eq "wwhts.com")  or  # WWWhatsNew, powered by bit.ly
 	    ($auth eq "dnlchw.net") or
@@ -504,6 +505,7 @@ $unshort = sub{
 	    ($auth eq "on.wsj.com")	or	# Wall Street Journal
 	    ($auth eq "recode.net")	or	($auth eq "on.recode.net")	or
 	    ($auth eq "theatln.tc")	or	# The Atlantic
+	    ($auth eq "the-fa.com")	or	# Powered by po.st
 	    ($auth eq "to.pbs.org")	or	# PBS
 	    ($auth eq "esriurl.com")	or	# ESRI
 	    ($auth eq "go.nasa.gov")	or	# NASA
