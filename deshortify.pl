@@ -294,12 +294,12 @@ $unshort = sub{
 	    ($auth eq "fdl.me")	or
 	    ($auth eq "fon.gs") or	# Fon Get Simple (By the fon.com guys)
 	    ($auth eq "fxn.ws") or	# Fox News
-        ($auth eq "git.io") or  # GitHub
+	    ($auth eq "git.io") or  # GitHub
 	    ($auth eq "gkl.st")	or	# GeekList
 	    ($auth eq "glo.bo")	or	# Brazilian Globo
 	    ($auth eq "goo.gl")	or	# Google
 	    ($auth eq "grn.bz")	or
-        ($auth eq "gtg.lu") or  # GetGlue (TV shows)
+	    ($auth eq "gtg.lu") or  # GetGlue (TV shows)
 	    ($auth eq "gu.com")	or	# The Guardian
 	    ($auth eq "htl.li")	or
 	    ($auth eq "htn.to")	or
@@ -310,6 +310,7 @@ $unshort = sub{
 	    ($auth eq "kck.st")	or	# Kickstarter
 	    ($auth eq "kcy.me")	or	# Karmacracy
 	    ($auth eq "kng.ht")	or	# Knight Foundation
+	    ($auth eq "lat.ms")	or
 	    ($auth eq "mbl.mx")	or
 	    ($auth eq "mun.do")	or	# El Mundo
 	    ($auth eq "muo.fm")	or	# MakeUseOf
@@ -353,8 +354,10 @@ $unshort = sub{
 	    ($auth eq "vsb.ly")	or
 	    ($auth eq "wef.ch")	or	# WeForum
 	    ($auth eq "wh.gov") or	# Whitehouse.gov
+	    ($auth eq "wpo.st")	or	# Washington Post
 	    ($auth eq "29g.us")	or
 	    ($auth eq "6sen.se")	or
+	    ($auth eq "atfp.co")	or
 	    ($auth eq "amba.to")	or	# Ameba.jp
 	    ($auth eq "amzn.to")	or	# Amazon.com
 	    ($auth eq "apne.ws")	or	# AP news
@@ -385,7 +388,7 @@ $unshort = sub{
 	    ($auth eq "likr.es")	or	# Powered by TribApp
 	    ($auth eq "lnkd.in")	or	# Linkedin
 	    ($auth eq "mdia.st")	or	# Mediaset (spanish TV station)
-        ($auth eq "mirr.im")    or  # The Daily Mirror (UK newspaper)
+	    ($auth eq "mirr.im")    or  # The Daily Mirror (UK newspaper)
 	    ($auth eq "monk.ly")	or
 	    ($auth eq "mrkt.ms")	or	# MarketMeSuite (SEO platform)
 	    ($auth eq "msft.it")	or	# Microsoft
@@ -404,7 +407,7 @@ $unshort = sub{
 	    ($auth eq "sbne.ws")	or	# SmartBrief News
 	    ($auth eq "stuf.in")	or	#
 	    ($auth eq "redd.it")	or	($auth eq "www.reddit.com" and $path =~ m#^/tb/#)   or  # Reddit
-        ($auth eq "reut.rs")    or  # Reuters
+	    ($auth eq "reut.rs")    or  # Reuters
 	    ($auth eq "seen.li")	or	($auth eq "seenthis.net" and $path eq "/index.php")	or # SeenThis, AKA http://seenthis.net/index.php?action=seenli&me=1ing
 	    ($auth eq "seod.co")	or
 	    ($auth eq "shar.es")	or
@@ -463,6 +466,7 @@ $unshort = sub{
 	    ($auth eq "short.ie")	or
 	    ($auth eq "short.to")	or
 	    ($auth eq "slate.me")	or	# The Slate
+	    ($auth eq "specc.ie")	or
 #	    ($auth eq "spoti.fi")	or	# Spotify. Not really worth deshortening as the full URL doesn't contain valuable info (track name, etc)
 	    ($auth eq "s.shr.lc")	or	# Shareaholic, bitly-powered
 	    ($auth eq "s.si.edu")	or	# Smithsonian
@@ -498,6 +502,7 @@ $unshort = sub{
 	    ($auth eq "elconfi.de")	or	# El Confidencial (spanish newspaper)
 	    ($auth eq "feedly.com")	or
 	    ($auth eq "go.usa.gov")	or
+	    ($auth eq "l.aunch.us")	or
 	    ($auth eq "macrumo.rs")	or	# Mac Rumors
 	    ($auth eq "mitsmr.com")	or
 	    ($auth eq "oak.ctx.ly")	or
