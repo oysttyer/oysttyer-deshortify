@@ -293,6 +293,7 @@ $unshort = sub{
 	    ($auth eq "esp.tl") or	# Powered by bitly
 	    ($auth eq "fdl.me")	or
 	    ($auth eq "fon.gs") or	# Fon Get Simple (By the fon.com guys)
+	    ($auth eq "fro.gd")	or	# Frog Design
 	    ($auth eq "fxn.ws") or	# Fox News
 	    ($auth eq "git.io") or  # GitHub
 	    ($auth eq "gkl.st")	or	# GeekList
@@ -327,6 +328,7 @@ $unshort = sub{
 	    ($auth eq "rdd.me") or
 	    ($auth eq "red.ht")	or
 	    ($auth eq "reg.cx")	or
+	    ($auth eq "rol.st") or	# Rolling Stone magazine
 	    ($auth eq "rlu.ru")	or
 	    ($auth eq "rpx.me")	or	# http://janrain.com, social media company
 	    ($auth eq "rww.to")	or
@@ -335,6 +337,7 @@ $unshort = sub{
 	    ($auth eq "s.coop")	or	# Cooperative shortening
 	    ($auth eq "see.sc")	or
 	    ($auth eq "sfy.co")	or	# Storify
+	    ($auth eq "shr.gs")	or
 	    ($auth eq "smf.is")	or	# Summify
 	    ($auth eq "sns.mx")	or	# SNS analytics
 	    ($auth eq "soa.li")	or
@@ -350,6 +353,7 @@ $unshort = sub{
 	    ($auth eq "tpm.ly")	or
 	    ($auth eq "tpt.to")	or
 	    ($auth eq "ur1.ca")	or
+	    ($auth eq "ver.ec") or	# E-Cartelera (spanish tv&movies)
 	    ($auth eq "vsb.li")	or
 	    ($auth eq "vsb.ly")	or
 	    ($auth eq "wef.ch")	or	# WeForum
@@ -379,6 +383,7 @@ $unshort = sub{
 # 	    ($auth eq "flic.kr")	or	# Hhhmm, dunno is there's much use in de-shortening to flickr.com anyway.
 	    ($auth eq "flip.it")	or	# Flipboard
 	    ($auth eq "fork.ly")	or	# Forkly.com, although full URL doesn't add any useable info, much like foursquare
+	    ($auth eq "geog.gr")	or	# Geographical.co.uk
 	    ($auth eq "gen.cat")	or	# Generalitat Catalana (catalonian gov't)
 	    ($auth eq "hint.fm")	or
 	    ($auth eq "huff.to")	or	# The Huffington Post
@@ -489,6 +494,7 @@ $unshort = sub{
 	    ($auth eq "m.safe.mn")	or
 	    ($auth eq "onforb.es")	or	# Forbes
 	    ($auth eq "onion.com")	or	# The Onion
+	    ($auth eq "on.ft.com")	or
 	    ($auth eq "on.rt.com")	or	# RT
 	    ($auth eq "pocket.co")	or	($auth eq "getpocket.com" and $path =~ m#^/s#)	or	# GetPocket, also known as ReadItLater
 	    ($auth eq "politi.co")	or	# Politico.com newspaper
@@ -540,8 +546,10 @@ $unshort = sub{
 	    ($query =~ m#utm_source=# )	or	# Any URL from *any* server which contains "utm_source=" looks like a social SEO marketing campaign-speech-enabled linkification
 	    ($query =~ m#utm_medium=# )	or	# Any URL from *any* server which contains "utm_medium=" looks like a social SEO marketing campaign-speech-enabled linkification
 	    ($query =~ m#url=http# )	or	# Any URL from *any* server which contains "url=http" looks like a redirector
+	    ($query =~ m#^p=\d+$# )	or	# Any URL from *any* server which contains "p=1234" looks like a wordpress
 	    ($auth eq "www.guardian.co.uk" and $path =~ m#^/p/# )	or	# Guardian short links, e.g. http://www.guardian.co.uk/p/3fz77/tw
-	    ($auth eq "www.eldiario.es" and $path =~ m#^/_# )	# ElDiario short links, e.g. www.eldiario.es/_1b3454af
+	    ($auth eq "www.eldiario.es" and $path =~ m#^/_# )	or	# ElDiario short links, e.g. www.eldiario.es/_1b3454af
+	    ($auth eq "www.meneame.net" and $path =~ m#^/go# )	# Menéame.net redirections (not posts, etc)
 	    )
 	{
 		$unshorting_method = "HEAD";	# For these servers, perform a HTTP HEAD request

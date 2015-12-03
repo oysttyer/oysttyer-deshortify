@@ -52,6 +52,8 @@ The following extra options are available:
 * `extpref_deshortifyalways=1`: By default, deshortify only works on a list of known URL shorteners. This means "shorteners that [Iván](http://twitter.com/RealIvanSanchez) has seen in his timeline". Setting this will cause deshortify to *always* follow a link, regardless of if the URL seems to come from a shortener. Be warned: this means one more HTTP request per URL, which means more lagginess.
 
 
+`deshortify` needs `libwww-perl` and `liburi-find-perl`. You can install them by running `cpan URI::Find`, `cpan URI::Split` and `cpan LWP::UserAgent`.
+
 
 ## Legalese
 
