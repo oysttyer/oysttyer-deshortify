@@ -581,6 +581,13 @@ $unshort = sub{
 		$unshorting_regexp = qr/window\.location(\.href)?\s*=\s*["'](.*?)["']\s*;/;
 		$unshorting_thing_were_looking_for = "window.location";
 	}
+	elsif (($auth eq "www.donotlink.com" ))
+	{
+		$unshorting_method = "REGEXP";	# For these servers, look for the first defined javascript snippet with "window.location=foo"
+# 		$unshorting_regexp = qr/window.location\s*=\s*["'](.*?)["']\s*;/;
+		$unshorting_regexp = qr/window\.location\.href\s*=\s*["'](.*?)["']\s*;/;
+		$unshorting_thing_were_looking_for = "window.location";
+	}
 # 	elsif (($auth =~ m/^news\.google\.[a-z]{2,3}$/)	# For a while, Google News stopped issuing HTTP 302s.
 # 	      )
 # 	{
