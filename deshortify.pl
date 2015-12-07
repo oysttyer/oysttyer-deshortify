@@ -240,7 +240,7 @@ $unshort = sub{
 
 	# Gathered a few shorteners. Should not be considered as a comprehensive list, but it'll do.
 	if (($path =~ m#^/p/#)  or  # Generic short links
-        ($auth eq "g.co")	or	# Google
+	    ($auth eq "g.co")	or	# Google
 	    ($auth eq "j.mp")	or
 	    ($auth eq "q.gs")	or
 	    ($auth eq "n.pr")	or	# NPR, National Public Radio (USA)
@@ -269,6 +269,7 @@ $unshort = sub{
 	    ($auth eq "tr.im")	or
 	    ($auth eq "wj.la")	or	# ABC7 News (washington)
 	    ($auth eq "wp.me")	or	# Wordpress
+	    ($auth eq "29g.us")	or
 	    ($auth eq "adf.ly")	or
 	    ($auth eq "aka.ms")	or	# Microsoft's "Social eXperience Platform"
 	    ($auth eq "ara.tv")	or	# alarabiya.net
@@ -289,8 +290,9 @@ $unshort = sub{
 	    ($auth eq "cur.lv")	or
 	    ($auth eq "del.ly")	or	# Powered by Sprinklr
 	    ($auth eq "dld.bz")	or
+	    ($auth eq "ebx.sh")	or
 	    ($auth eq "ebz.by")	or
-	    ($auth eq "esp.tl") or	# Powered by bitly
+	    ($auth eq "esp.tl")	or	# Powered by bitly
 	    ($auth eq "fdl.me")	or
 	    ($auth eq "fon.gs") or	# Fon Get Simple (By the fon.com guys)
 	    ($auth eq "fro.gd")	or	# Frog Design
@@ -300,7 +302,7 @@ $unshort = sub{
 	    ($auth eq "glo.bo")	or	# Brazilian Globo
 	    ($auth eq "goo.gl")	or	# Google
 	    ($auth eq "grn.bz")	or
-	    ($auth eq "gtg.lu") or  # GetGlue (TV shows)
+	    ($auth eq "gtg.lu")	or  # GetGlue (TV shows)
 	    ($auth eq "gu.com")	or	# The Guardian
 	    ($auth eq "htl.li")	or
 	    ($auth eq "htn.to")	or
@@ -320,7 +322,7 @@ $unshort = sub{
 	    ($auth eq "nsm.me")	or
 	    ($auth eq "nym.ag")	or	# New York Magazine
 	    ($auth eq "ofa.bo")	or
-	    ($auth eq "osf.to") or	# Open Society Foundation
+	    ($auth eq "osf.to")	or	# Open Society Foundation
 	    ($auth eq "owl.li")	or
 	    ($auth eq "pco.lt")	or
 	    ($auth eq "prn.to")	or	# PR News Wire
@@ -359,7 +361,7 @@ $unshort = sub{
 	    ($auth eq "wef.ch")	or	# WeForum
 	    ($auth eq "wh.gov") or	# Whitehouse.gov
 	    ($auth eq "wpo.st")	or	# Washington Post
-	    ($auth eq "29g.us")	or
+	    ($auth eq "1drv.ms")	or
 	    ($auth eq "6sen.se")	or
 	    ($auth eq "atfp.co")	or
 	    ($auth eq "amba.to")	or	# Ameba.jp
@@ -369,7 +371,7 @@ $unshort = sub{
 	    ($auth eq "buff.ly")	or
 	    ($auth eq "buzz.mw")	or
 	    ($auth eq "chzb.gr")	or	# Cheezburguer network
-	    ($auth eq "clic.bz")    or  # Powered by bit.ly
+	    ($auth eq "clic.bz")	or  # Powered by bit.ly
 	    ($auth eq "cnet.co")	or	# C-Net
 	    ($auth eq "cort.as")	or
 	    ($auth eq "cutv.ws")	or	# cultureunplugged.com
@@ -390,6 +392,7 @@ $unshort = sub{
 	    ($auth eq "imrn.me")	or
 	    ($auth eq "josh.re")	or
 	    ($auth eq "jrnl.to")	or	# Powered by bit.ly
+	    ($auth eq "klou.tt")	or
 	    ($auth eq "likr.es")	or	# Powered by TribApp
 	    ($auth eq "lnkd.in")	or	# Linkedin
 	    ($auth eq "mdia.st")	or	# Mediaset (spanish TV station)
@@ -401,7 +404,8 @@ $unshort = sub{
 	    ($auth eq "neow.in")	or	# NeoWin
 	    ($auth eq "note.io")	or
 	    ($auth eq "noti.ca")	or
-	    ($auth eq "nyti.ms")    or  # New York Times
+	    ($auth eq "nydn.us")	or	# New York Daily News
+	    ($auth eq "nyti.ms")	or  # New York Times
 	    ($auth eq "nzzl.me")	or
 	    ($auth eq "pear.ly")	or
 	    ($auth eq "post.ly")	or	# Posterous
@@ -410,9 +414,10 @@ $unshort = sub{
 	    ($auth eq "qkme.me")	or	# QuickMeme
 	    ($auth eq "read.bi")	or	# Business Insider
 	    ($auth eq "sbne.ws")	or	# SmartBrief News
+	    ($auth eq "snpy.tv")	or	# Snappy TV
 	    ($auth eq "stuf.in")	or	#
 	    ($auth eq "redd.it")	or	($auth eq "www.reddit.com" and $path =~ m#^/tb/#)   or  # Reddit
-	    ($auth eq "reut.rs")    or  # Reuters
+	    ($auth eq "reut.rs")	or  # Reuters
 	    ($auth eq "seen.li")	or	($auth eq "seenthis.net" and $path eq "/index.php")	or # SeenThis, AKA http://seenthis.net/index.php?action=seenli&me=1ing
 	    ($auth eq "seod.co")	or
 	    ($auth eq "shar.es")	or
@@ -445,7 +450,7 @@ $unshort = sub{
 	    ($auth eq "egent.me")	or
 	    ($auth eq "elsab.me")	or
 # 	    ($auth eq "enwp.org")	or	# English Wikipedia. Not really worth deshortening.
-	    ($auth eq "flpbd.it")   or  # Flipboard
+	    ($auth eq "flpbd.it")	or  # Flipboard
 	    ($auth eq "gizmo.do")	or	# Gizmodo
 	    ($auth eq "linkd.in")	or	# LinkedIn
 	    ($auth eq "l.r-g.me")	or	# Powered by bit.ly
@@ -481,14 +486,16 @@ $unshort = sub{
 	    ($auth eq "thkpr.gs")	or	# ThinkProgress.org
 	    ($auth eq "thndr.me")	or	($auth eq "www.thunderclap.it") or
 	    ($auth eq "twurl.nl")	or
+	    ($auth eq "ustre.am")	or
 	    ($auth eq "w.abc.es")	or
 	    ($auth eq "wired.uk")	or
 	    ($auth eq "ymlp.com")	or
 #	    ($auth eq "youtu.be")	or	# This one is actually useful: no information is gained by de-shortening.
 	    ($auth eq "1.usa.gov")	or	# USA
+	    ($auth eq "atres.red")	or	# Atresmedia (antena 3 et al), spanish media group
 	    ($auth eq "binged.it")	or	# Microsoft goes Bing!. Bing!
 	    ($auth eq "bitly.com")	or
-	    ($auth eq "drudge.tw")  or
+	    ($auth eq "drudge.tw")	or
 	    ($auth eq "keruff.it")	or
 	    ($auth eq "mktfan.es")	or
 	    ($auth eq "m.safe.mn")	or
@@ -502,7 +509,7 @@ $unshort = sub{
 	    ($auth eq "urlads.co")	or
 	    ($auth eq "washin.st")	or	# Washington institute
 	    ($auth eq "wlstrm.me")	or	# Jeff Walstrom
-	    ($auth eq "wwhts.com")  or  # WWWhatsNew, powered by bit.ly
+	    ($auth eq "wwhts.com")	or  # WWWhatsNew, powered by bit.ly
 	    ($auth eq "dnlchw.net") or
 	    ($auth eq "eepurl.com")	or
 	    ($auth eq "elconfi.de")	or	# El Confidencial (spanish newspaper)
@@ -514,17 +521,20 @@ $unshort = sub{
 	    ($auth eq "oak.ctx.ly")	or
 	    ($auth eq "on.io9.com")	or	# IO9
 	    ($auth eq "on.mash.to")	or	# Mashable
+	    ($auth eq "on.tcrn.ch")	or	# TechCrunch
 	    ($auth eq "on.wsj.com")	or	# Wall Street Journal
 	    ($auth eq "recode.net")	or	($auth eq "on.recode.net")	or
+	    ($auth eq "s.hbr.org")	or
 	    ($auth eq "theatln.tc")	or	# The Atlantic
 	    ($auth eq "the-fa.com")	or	# Powered by po.st
+	    ($auth eq "thewur.com")	or
 	    ($auth eq "to.pbs.org")	or	# PBS
 	    ($auth eq "esriurl.com")	or	# ESRI
 	    ($auth eq "go.nasa.gov")	or	# NASA
 	    ($auth eq "GovAlert.eu")	or
-	    ($auth eq "hackaday.com")	or
 	    ($auth eq "tinyurl.com")	or
 	    ($auth eq "trackurl.it")	or
+	    ($auth eq "hackaday.com")	or
 	    ($auth eq "r.spruse.com")	or	# Powered by bit.ly
 	    ($auth eq "www.tumblr.com")	or
 	    ($auth eq "feeds.gawker.com")	or
