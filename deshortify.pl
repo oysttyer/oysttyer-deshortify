@@ -258,6 +258,7 @@ $unshort = sub{
 	    ($auth eq "is.gd")	or
 	    ($auth eq "kl.am")	or
 	    ($auth eq "me.lt")	or
+	    ($auth eq "mf.tt")	or
 	    ($auth eq "om.ly")	or
 	    ($auth eq "ow.ly")	or
 # 	    ($auth eq "po.st")	or	# Doesn't allow HTTP HEAD requests, doing GET requests.
@@ -301,6 +302,7 @@ $unshort = sub{
 	    ($auth eq "gkl.st")	or	# GeekList
 	    ($auth eq "glo.bo")	or	# Brazilian Globo
 	    ($auth eq "goo.gl")	or	# Google
+	    ($auth eq "gph.is")	or	# Giphy
 	    ($auth eq "grn.bz")	or
 	    ($auth eq "gtg.lu")	or  # GetGlue (TV shows)
 	    ($auth eq "gu.com")	or	# The Guardian
@@ -368,8 +370,10 @@ $unshort = sub{
 	    ($auth eq "amzn.to")	or	# Amazon.com
 	    ($auth eq "apne.ws")	or	# AP news
 	    ($auth eq "arcg.is")	or	# ESRI's ArgCIS online
+	    ($auth eq "blgs.co")	or
 	    ($auth eq "buff.ly")	or
 	    ($auth eq "buzz.mw")	or
+	    ($auth eq "cbsn.ws")	or	# CBS News
 	    ($auth eq "chzb.gr")	or	# Cheezburguer network
 	    ($auth eq "clic.bz")	or  # Powered by bit.ly
 	    ($auth eq "cnet.co")	or	# C-Net
@@ -425,6 +429,7 @@ $unshort = sub{
 	    ($auth eq "slnm.us")	or	# Salon
 	    ($auth eq "sml8.it")	or
 	    ($auth eq "smrt.in")	or	# Powered by bit.ly
+	    ($auth eq "snpy.tv")	or	# Snappy TV
 	    ($auth eq "tcrn.ch")	or	# Techcrunch
 	    ($auth eq "tiny.cc")	or
 	    ($auth eq "trib.al")	or	($auth =~ m/\.trib\.al$/ )	or	# whatever.trib.al is done by SocialFlow
@@ -497,12 +502,14 @@ $unshort = sub{
 	    ($auth eq "bitly.com")	or
 	    ($auth eq "drudge.tw")	or
 	    ($auth eq "keruff.it")	or
+	    ($auth eq "mklnd.com")	or
 	    ($auth eq "mktfan.es")	or
 	    ($auth eq "m.safe.mn")	or
 	    ($auth eq "onforb.es")	or	# Forbes
 	    ($auth eq "onion.com")	or	# The Onion
 	    ($auth eq "on.ft.com")	or
 	    ($auth eq "on.rt.com")	or	# RT
+	    ($auth eq "pewrsr.ch")	or
 	    ($auth eq "pocket.co")	or	($auth eq "getpocket.com" and $path =~ m#^/s#)	or	# GetPocket, also known as ReadItLater
 	    ($auth eq "politi.co")	or	# Politico.com newspaper
 	    ($auth eq "thebea.st")	or	# The Daily Beast
