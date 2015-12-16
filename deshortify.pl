@@ -167,17 +167,20 @@ $cleanup_url = sub{
                 or ( $name eq "tag" and $value eq "as.rss" )
                 or ( $name eq "ref" and $value eq "rss" )
                 or ( $name eq "ref" and $value eq "tw" )
+                or ( $name eq "id_externo_rsoc" and $value eq "TW_CM" )
                 or ( $name eq "newsfeed" and $value eq "true" )
                 or ( $name eq "spref" and $value eq "tw" )
                 or ( $name eq "spref" and $value eq "fb" )
                 or ( $name eq "spref" and $value eq "gr" )
                 or ( $name eq "source" and $value eq "twitter" )
+                or ( $name eq "platform" and $value eq "hootsuite" )
                 or ( $name eq "mbid" and $value eq "social_retweet" )   # New Yorker et al
                 or ( $auth eq "www.youtube.com" and $name eq "feature")
                 or ( $auth eq "www.nytimes.com" and $name eq "smid" )   # New York Times
                 or ( $auth eq "www.nytimes.com" and $name eq "seid" )   # New York Times
                 or ( $name eq "awesm" ) # Appears as a logger of awesm shortener, at least in storify
                 or ( $name eq "CMP"  and $value eq "twt_gu")    # Guardian.co.uk short links
+                or ( $name eq "ex_cid" and $value eq "story-twitter")
                     )
             {
                 my $expr = quotemeta("$name=$value");   # This prevents strings with "+" to be interpreted as part of the regexp
@@ -273,12 +276,14 @@ $unshort = sub{
 	    ($auth eq "29g.us")	or
 	    ($auth eq "adf.ly")	or
 	    ($auth eq "aka.ms")	or	# Microsoft's "Social eXperience Platform"
+	    ($auth eq "api.pw")	or	# Programmable Web
 	    ($auth eq "ara.tv")	or	# alarabiya.net
 	    ($auth eq "ars.to")	or	# Ars Tecnica
 	    ($auth eq "aol.it")	or	# AOL, America OnLine
 	    ($auth eq "awe.sm")	or
 	    ($auth eq "bbc.in")	or	# bbc.co.uk
 	    ($auth eq "bit.ly")	or
+	    ($auth eq "bsa.sc")	or	# British Science Association
 	    ($auth eq "cbc.sh") or	# leads to cbc.ca. Congrats, four characters saved.
 	    ($auth eq "cdb.io")	or
 	    ($auth eq "cgd.to")	or
@@ -298,13 +303,14 @@ $unshort = sub{
 	    ($auth eq "fon.gs") or	# Fon Get Simple (By the fon.com guys)
 	    ($auth eq "fro.gd")	or	# Frog Design
 	    ($auth eq "fxn.ws") or	# Fox News
+	    ($auth eq "gaw.kr")	or	# Gawker
 	    ($auth eq "git.io") or  # GitHub
 	    ($auth eq "gkl.st")	or	# GeekList
 	    ($auth eq "glo.bo")	or	# Brazilian Globo
 	    ($auth eq "goo.gl")	or	# Google
 	    ($auth eq "gph.is")	or	# Giphy
 	    ($auth eq "grn.bz")	or
-	    ($auth eq "gtg.lu")	or  # GetGlue (TV shows)
+	    ($auth eq "gtg.lu")	or	# GetGlue (TV shows)
 	    ($auth eq "gu.com")	or	# The Guardian
 	    ($auth eq "htl.li")	or
 	    ($auth eq "htn.to")	or
@@ -336,6 +342,7 @@ $unshort = sub{
 	    ($auth eq "rlu.ru")	or
 	    ($auth eq "rpx.me")	or	# http://janrain.com, social media company
 	    ($auth eq "rww.to")	or
+	    ($auth eq "si1.es") or
 	    ($auth eq "sbn.to")	or
 	    ($auth eq "sco.lt")	or
 	    ($auth eq "s.coop")	or	# Cooperative shortening
@@ -361,8 +368,9 @@ $unshort = sub{
 	    ($auth eq "vsb.li")	or
 	    ($auth eq "vsb.ly")	or
 	    ($auth eq "wef.ch")	or	# WeForum
-	    ($auth eq "wh.gov") or	# Whitehouse.gov
+	    ($auth eq "wh.gov")	or	# Whitehouse.gov
 	    ($auth eq "wpo.st")	or	# Washington Post
+	    ($auth eq "zd.net")	or
 	    ($auth eq "1drv.ms")	or
 	    ($auth eq "6sen.se")	or
 	    ($auth eq "atfp.co")	or
@@ -373,6 +381,7 @@ $unshort = sub{
 	    ($auth eq "blgs.co")	or
 	    ($auth eq "buff.ly")	or
 	    ($auth eq "buzz.mw")	or
+	    ($auth eq "bzfd.it")	or	# Buzzfeed
 	    ($auth eq "cbsn.ws")	or	# CBS News
 	    ($auth eq "chzb.gr")	or	# Cheezburguer network
 	    ($auth eq "clic.bz")	or  # Powered by bit.ly
@@ -392,6 +401,7 @@ $unshort = sub{
 	    ($auth eq "geog.gr")	or	# Geographical.co.uk
 	    ($auth eq "gen.cat")	or	# Generalitat Catalana (catalonian gov't)
 	    ($auth eq "hint.fm")	or
+	    ($auth eq "hubs.ly")	or
 	    ($auth eq "huff.to")	or	# The Huffington Post
 	    ($auth eq "imrn.me")	or
 	    ($auth eq "josh.re")	or
@@ -401,6 +411,7 @@ $unshort = sub{
 	    ($auth eq "lnkd.in")	or	# Linkedin
 	    ($auth eq "mdia.st")	or	# Mediaset (spanish TV station)
 	    ($auth eq "mirr.im")    or  # The Daily Mirror (UK newspaper)
+	    ($auth eq "miud.in")	or	($auth eq "redirect.miud.in")	or
 	    ($auth eq "monk.ly")	or
 	    ($auth eq "mrkt.ms")	or	# MarketMeSuite (SEO platform)
 	    ($auth eq "msft.it")	or	# Microsoft
@@ -432,6 +443,7 @@ $unshort = sub{
 	    ($auth eq "snpy.tv")	or	# Snappy TV
 	    ($auth eq "tcrn.ch")	or	# Techcrunch
 	    ($auth eq "tiny.cc")	or
+	    ($auth eq "tuxi.tk")	or
 	    ($auth eq "trib.al")	or	($auth =~ m/\.trib\.al$/ )	or	# whatever.trib.al is done by SocialFlow
 	    ($auth eq "untp.it")	or	# Untap, via Bitly
 	    ($auth eq "usat.ly")	or	# USA Today
@@ -445,11 +457,13 @@ $unshort = sub{
 	    ($auth eq "xurl.es")	or
 	    ($auth eq "yhoo.it")	or	# Yahoo
 	    ($auth eq "zite.to")	or
+	    ($auth eq "53eig.ht")	or ($auth eq "fivethirtyeight.com")	or
 	    ($auth eq "a.eoi.co")	or	# Escuela de Organización Industrial
 	    ($auth eq "a.eoi.es")	or	# Escuela de Organización Industrial
 	    ($auth eq "amzn.com")	or	# Amazon.com
 	    ($auth eq "baixa.ki")	or	# Baixa Ki, brazilian miscellanea agregator
 	    ($auth eq "bloom.bg")	or	# Bloomberg News
+	    ($auth eq "brook.gs")	or
 	    ($auth eq "buswk.co")	or	# Business Week
 	    ($auth eq "cultm.ac")	or	# Cult of Mac
 	    ($auth eq "egent.me")	or
@@ -502,9 +516,12 @@ $unshort = sub{
 	    ($auth eq "bitly.com")	or
 	    ($auth eq "drudge.tw")	or
 	    ($auth eq "keruff.it")	or
+	    ($auth eq "interc.pt")	or
+	    ($auth eq "mitsha.re")	or	# MIT share
 	    ($auth eq "mklnd.com")	or
 	    ($auth eq "mktfan.es")	or
 	    ($auth eq "m.safe.mn")	or
+	    ($auth eq "ondace.ro")	or
 	    ($auth eq "onforb.es")	or	# Forbes
 	    ($auth eq "onion.com")	or	# The Onion
 	    ($auth eq "on.ft.com")	or
@@ -512,6 +529,7 @@ $unshort = sub{
 	    ($auth eq "pewrsr.ch")	or
 	    ($auth eq "pocket.co")	or	($auth eq "getpocket.com" and $path =~ m#^/s#)	or	# GetPocket, also known as ReadItLater
 	    ($auth eq "politi.co")	or	# Politico.com newspaper
+	    ($auth eq "s.hbr.org")	or
 	    ($auth eq "thebea.st")	or	# The Daily Beast
 	    ($auth eq "urlads.co")	or
 	    ($auth eq "washin.st")	or	# Washington institute
@@ -531,23 +549,26 @@ $unshort = sub{
 	    ($auth eq "on.tcrn.ch")	or	# TechCrunch
 	    ($auth eq "on.wsj.com")	or	# Wall Street Journal
 	    ($auth eq "recode.net")	or	($auth eq "on.recode.net")	or
-	    ($auth eq "s.hbr.org")	or
 	    ($auth eq "theatln.tc")	or	# The Atlantic
 	    ($auth eq "the-fa.com")	or	# Powered by po.st
 	    ($auth eq "thewur.com")	or
 	    ($auth eq "to.pbs.org")	or	# PBS
+	    ($auth eq "tus140.com")	or
 	    ($auth eq "esriurl.com")	or	# ESRI
 	    ($auth eq "go.nasa.gov")	or	# NASA
 	    ($auth eq "GovAlert.eu")	or
+	    ($auth eq "smarturl.it")	or
 	    ($auth eq "tinyurl.com")	or
 	    ($auth eq "trackurl.it")	or
 	    ($auth eq "hackaday.com")	or
 	    ($auth eq "r.spruse.com")	or	# Powered by bit.ly
+	    ($auth eq "on.natgeo.com")	or	# National Geographic
 	    ($auth eq "www.tumblr.com")	or
 	    ($auth eq "feeds.gawker.com")	or
 	    ($auth eq "feeds.feedburner.com")	or
 	    ($auth eq "feedproxy.google.com")	or
 	    ($auth eq "www.pheedcontent.com")	or	# Oh, look, Imma l337 h4xx0r. Geez.
+	    ($auth eq "click.linksynergy.com")	or
 	    ($auth =~ m/^news\.google\.[a-z]{2,3}$/)	or	# Hah! You thought you were going to pollute my links, did you, google news?
 	    ($auth eq "www.linkedin.com" and $path eq "/slink")	or	# A tricky one. lnkd.in redirects to www.linkedin.com/slink?foo, which redirects again.
 	    ($auth =~ m/^feeds\./)	or	# OK, I've had enough of you, feeds.whatever.whatever!
@@ -564,9 +585,10 @@ $unshort = sub{
 	    ($query =~ m#utm_medium=# )	or	# Any URL from *any* server which contains "utm_medium=" looks like a social SEO marketing campaign-speech-enabled linkification
 	    ($query =~ m#url=http# )	or	# Any URL from *any* server which contains "url=http" looks like a redirector
 	    ($query =~ m#^p=\d+$# )	or	# Any URL from *any* server which contains "p=1234" looks like a wordpress
+	    ($query =~ m#^\d+$# )	or	# Any URL from *any* server which is just numbers, high prob. it's a code for something else
 	    ($auth eq "www.guardian.co.uk" and $path =~ m#^/p/# )	or	# Guardian short links, e.g. http://www.guardian.co.uk/p/3fz77/tw
 	    ($auth eq "www.eldiario.es" and $path =~ m#^/_# )	or	# ElDiario short links, e.g. www.eldiario.es/_1b3454af
-	    ($auth eq "www.meneame.net" and $path =~ m#^/go# )	# Menéame.net redirections (not posts, etc)
+	    ($auth eq "www.meneame.net" and $path =~ m#^/(.*\/)?go# )	# Menéame.net redirections (not posts, etc)
 	    )
 	{
 		$unshorting_method = "HEAD";	# For these servers, perform a HTTP HEAD request
