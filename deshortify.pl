@@ -181,6 +181,8 @@ $cleanup_url = sub{
                 or ( $name eq "awesm" ) # Appears as a logger of awesm shortener, at least in storify
                 or ( $name eq "CMP"  and $value eq "twt_gu")    # Guardian.co.uk short links
                 or ( $name eq "ex_cid" and $value eq "story-twitter")
+                or ( $name eq "ocid" and $value eq "socialflow_twitter")
+                or ( $name eq "a" and $value eq "socialmedia")	# In meetup.com links
                     )
             {
                 my $expr = quotemeta("$name=$value");   # This prevents strings with "+" to be interpreted as part of the regexp
@@ -284,7 +286,7 @@ $unshort = sub{
 	    ($auth eq "bbc.in")	or	# bbc.co.uk
 	    ($auth eq "bit.ly")	or
 	    ($auth eq "bsa.sc")	or	# British Science Association
-	    ($auth eq "cbc.sh") or	# leads to cbc.ca. Congrats, four characters saved.
+	    ($auth eq "cbc.sh")	or	# leads to cbc.ca. Congrats, four characters saved.
 	    ($auth eq "cdb.io")	or
 	    ($auth eq "cgd.to")	or
 	    ($auth eq "chn.ge")	or	# Change.org
@@ -300,11 +302,11 @@ $unshort = sub{
 	    ($auth eq "ebz.by")	or
 	    ($auth eq "esp.tl")	or	# Powered by bitly
 	    ($auth eq "fdl.me")	or
-	    ($auth eq "fon.gs") or	# Fon Get Simple (By the fon.com guys)
+	    ($auth eq "fon.gs")	or	# Fon Get Simple (By the fon.com guys)
 	    ($auth eq "fro.gd")	or	# Frog Design
-	    ($auth eq "fxn.ws") or	# Fox News
+	    ($auth eq "fxn.ws")	or	# Fox News
 	    ($auth eq "gaw.kr")	or	# Gawker
-	    ($auth eq "git.io") or  # GitHub
+	    ($auth eq "git.io")	or	# GitHub
 	    ($auth eq "gkl.st")	or	# GeekList
 	    ($auth eq "glo.bo")	or	# Brazilian Globo
 	    ($auth eq "goo.gl")	or	# Google
@@ -335,14 +337,15 @@ $unshort = sub{
 	    ($auth eq "pco.lt")	or
 	    ($auth eq "prn.to")	or	# PR News Wire
 	    ($auth eq "r88.it")	or
-	    ($auth eq "rdd.me") or
+	    ($auth eq "rdd.me")	or
 	    ($auth eq "red.ht")	or
 	    ($auth eq "reg.cx")	or
-	    ($auth eq "rol.st") or	# Rolling Stone magazine
+	    ($auth eq "rol.st")	or	# Rolling Stone magazine
 	    ($auth eq "rlu.ru")	or
 	    ($auth eq "rpx.me")	or	# http://janrain.com, social media company
+	    ($auth eq "rsc.li")	or
 	    ($auth eq "rww.to")	or
-	    ($auth eq "si1.es") or
+	    ($auth eq "si1.es")	or
 	    ($auth eq "sbn.to")	or
 	    ($auth eq "sco.lt")	or
 	    ($auth eq "s.coop")	or	# Cooperative shortening
@@ -359,12 +362,12 @@ $unshort = sub{
 	    ($auth eq "tgr.ph")	or	# The Telegraph
 	    ($auth eq "tnw.co")	or	# TheNextWeb
 	    ($auth eq "tnw.to")	or	# TheNextWeb
-	    ($auth eq "tny.cz") or
-	    ($auth eq "tny.gs") or
+	    ($auth eq "tny.cz")	or
+	    ($auth eq "tny.gs")	or
 	    ($auth eq "tpm.ly")	or
 	    ($auth eq "tpt.to")	or
 	    ($auth eq "ur1.ca")	or
-	    ($auth eq "ver.ec") or	# E-Cartelera (spanish tv&movies)
+	    ($auth eq "ver.ec")	or	# E-Cartelera (spanish tv&movies)
 	    ($auth eq "vsb.li")	or
 	    ($auth eq "vsb.ly")	or
 	    ($auth eq "wef.ch")	or	# WeForum
@@ -410,7 +413,7 @@ $unshort = sub{
 	    ($auth eq "likr.es")	or	# Powered by TribApp
 	    ($auth eq "lnkd.in")	or	# Linkedin
 	    ($auth eq "mdia.st")	or	# Mediaset (spanish TV station)
-	    ($auth eq "mirr.im")    or  # The Daily Mirror (UK newspaper)
+	    ($auth eq "mirr.im")	or	# The Daily Mirror (UK newspaper)
 	    ($auth eq "miud.in")	or	($auth eq "redirect.miud.in")	or
 	    ($auth eq "monk.ly")	or
 	    ($auth eq "mrkt.ms")	or	# MarketMeSuite (SEO platform)
@@ -428,6 +431,7 @@ $unshort = sub{
 	    ($auth eq "prsm.tc")	or
 	    ($auth eq "qkme.me")	or	# QuickMeme
 	    ($auth eq "read.bi")	or	# Business Insider
+	    ($auth eq "ride.sc")	or	# RideScout
 	    ($auth eq "sbne.ws")	or	# SmartBrief News
 	    ($auth eq "snpy.tv")	or	# Snappy TV
 	    ($auth eq "stuf.in")	or	#
@@ -460,6 +464,7 @@ $unshort = sub{
 	    ($auth eq "53eig.ht")	or ($auth eq "fivethirtyeight.com")	or
 	    ($auth eq "a.eoi.co")	or	# Escuela de Organización Industrial
 	    ($auth eq "a.eoi.es")	or	# Escuela de Organización Industrial
+	    ($auth eq "apr1.org")	or	# april.org (french something)
 	    ($auth eq "amzn.com")	or	# Amazon.com
 	    ($auth eq "baixa.ki")	or	# Baixa Ki, brazilian miscellanea agregator
 	    ($auth eq "bloom.bg")	or	# Bloomberg News
@@ -476,6 +481,7 @@ $unshort = sub{
 	    ($auth eq "maril.in")	or	# Marilink
 	    ($auth eq "mbist.ro")	or	# MediaBistro
 	    ($auth eq "mcmgz.in")	or	# Mac Magazine
+	    ($auth eq "meetu.ps")	or	($auth eq "www.meetup.com") or
 	    ($auth eq "menea.me")	or	# Menéame
 	    ($auth eq "mhoff.me")	or
 	    ($auth eq "migre.me")	or
@@ -515,8 +521,9 @@ $unshort = sub{
 	    ($auth eq "binged.it")	or	# Microsoft goes Bing!. Bing!
 	    ($auth eq "bitly.com")	or
 	    ($auth eq "drudge.tw")	or
-	    ($auth eq "keruff.it")	or
+	    ($auth eq "go.shr.lc")	or	# Short shareholic
 	    ($auth eq "interc.pt")	or
+	    ($auth eq "keruff.it")	or
 	    ($auth eq "mitsha.re")	or	# MIT share
 	    ($auth eq "mklnd.com")	or
 	    ($auth eq "mktfan.es")	or
@@ -560,6 +567,7 @@ $unshort = sub{
 	    ($auth eq "smarturl.it")	or
 	    ($auth eq "tinyurl.com")	or
 	    ($auth eq "trackurl.it")	or
+	    ($auth eq "www.ara.cat")	or
 	    ($auth eq "hackaday.com")	or
 	    ($auth eq "r.spruse.com")	or	# Powered by bit.ly
 	    ($auth eq "on.natgeo.com")	or	# National Geographic
@@ -588,7 +596,8 @@ $unshort = sub{
 	    ($query =~ m#^\d+$# )	or	# Any URL from *any* server which is just numbers, high prob. it's a code for something else
 	    ($auth eq "www.guardian.co.uk" and $path =~ m#^/p/# )	or	# Guardian short links, e.g. http://www.guardian.co.uk/p/3fz77/tw
 	    ($auth eq "www.eldiario.es" and $path =~ m#^/_# )	or	# ElDiario short links, e.g. www.eldiario.es/_1b3454af
-	    ($auth eq "www.meneame.net" and $path =~ m#^/(.*\/)?go# )	# Menéame.net redirections (not posts, etc)
+	    ($auth eq "www.meneame.net" and $path =~ m#^/(.*\/)?go# )	or	# Menéame.net redirections (not posts, etc)
+	    ($auth eq "www.stitcher.com" and $query =~ m#eid# )	# Stitcher podcasts if the podcast name is not shown
 	    )
 	{
 		$unshorting_method = "HEAD";	# For these servers, perform a HTTP HEAD request
