@@ -405,6 +405,7 @@ $unshort = sub{
 	    ($auth eq "gen.cat")	or	# Generalitat Catalana (catalonian gov't)
 	    ($auth eq "hint.fm")	or
 	    ($auth eq "hubs.ly")	or
+	    ($auth eq "hptx.al")	or	# Hypertextual
 	    ($auth eq "huff.to")	or	# The Huffington Post
 	    ($auth eq "imrn.me")	or
 	    ($auth eq "josh.re")	or
