@@ -163,7 +163,8 @@ $cleanup_url = sub{
         foreach $pair (@pairs){
             ($name, $value) = split(/=/, $pair);
 
-            if ($name eq "utm_source" or $name eq "utm_medium" or $name eq "utm_term" or $name eq "utm_content" or $name eq "utm_campaign"
+            if ($name =~ m#_source$# or $name =~ m#_medium$# or $name =~ m#_term$# or $name =~ m#_content$# or $name =~ m#_campaign$# or $name =~ m#_mchannel$# or $name =~ m#_kwd$#
+                or ( $name eq "utm_cid")
                 or ( $name eq "tag" and $value eq "as.rss" )
                 or ( $name eq "ref" and $value eq "rss" )
                 or ( $name eq "ref" and $value eq "tw" )
@@ -175,6 +176,7 @@ $cleanup_url = sub{
                 or ( $name eq "source" and $value eq "twitter" )
                 or ( $name eq "platform" and $value eq "hootsuite" )
                 or ( $name eq "mbid" and $value eq "social_retweet" )   # New Yorker et al
+                or ( $name eq "mbid" and $value eq "social_twitter" )   # New Yorker et al
                 or ( $auth eq "www.youtube.com" and $name eq "feature")
                 or ( $auth eq "www.nytimes.com" and $name eq "smid" )   # New York Times
                 or ( $auth eq "www.nytimes.com" and $name eq "seid" )   # New York Times
@@ -182,6 +184,9 @@ $cleanup_url = sub{
                 or ( $name eq "CMP"  and $value eq "twt_gu")    # Guardian.co.uk short links
                 or ( $name eq "ex_cid" and $value eq "story-twitter")
                 or ( $name eq "ocid" and $value eq "socialflow_twitter")
+                or ( $name eq "ocid" and $value eq "socialflow_facebook")
+                or ( $name eq "oc_src" and $value eq "social-sh")
+                or ( $name eq "soc_trk" and $value eq "tw")
                 or ( $name eq "a" and $value eq "socialmedia")	# In meetup.com links
                     )
             {
@@ -195,6 +200,19 @@ $cleanup_url = sub{
         $url = uri_join($scheme, $auth, $path, $query, $frag);
     }
 
+    if ($frag)
+    {
+		if ($auth eq "medium.com" or
+		    $auth eq "mashable.com"
+		    )
+		{
+			$frag = "";
+			
+			$url = uri_join($scheme, $auth, $path, $query, $frag);
+		}
+		
+    }
+    
 #       # Dirty trick to prevent escaped = and & and # to be unescaped (and mess up the query string part) - escape them again!
 #       $url =~ s/%24/%2524/i;  # $
 #       $url =~ s/%26/%2526/i;  # &
@@ -251,6 +269,7 @@ $unshort = sub{
 	    ($auth eq "n.pr")	or	# NPR, National Public Radio (USA)
 	    ($auth eq "t.co")	or	# twitter
 	    ($auth eq "v.gd")	or	# Ethical URL shortener by memset hosting
+	    ($auth eq "bv.ms")	or	# Bloomberg
 	    ($auth eq "cl.ly")	or
 	    ($auth eq "db.tt")	or
 	    ($auth eq "di.gg")	or
@@ -260,6 +279,7 @@ $unshort = sub{
 	    ($auth eq "fb.me")	or
 	    ($auth eq "fw.to")	or
 	    ($auth eq "ht.ly")	or
+	    ($auth eq "if.lc")	or
 	    ($auth eq "is.gd")	or
 	    ($auth eq "kl.am")	or
 	    ($auth eq "me.lt")	or
@@ -295,6 +315,7 @@ $unshort = sub{
 	    ($auth eq "cor.to")	or
 	    ($auth eq "cos.as")	or
 	    ($auth eq "cot.ag")	or
+	    ($auth eq "cnn.it")	or
 	    ($auth eq "cur.lv")	or
 	    ($auth eq "del.ly")	or	# Powered by Sprinklr
 	    ($auth eq "dld.bz")	or
@@ -303,6 +324,7 @@ $unshort = sub{
 	    ($auth eq "esp.tl")	or	# Powered by bitly
 	    ($auth eq "fdl.me")	or
 	    ($auth eq "fon.gs")	or	# Fon Get Simple (By the fon.com guys)
+	    ($auth eq "for.tn")	or	# Fortune.com
 	    ($auth eq "fro.gd")	or	# Frog Design
 	    ($auth eq "fxn.ws")	or	# Fox News
 	    ($auth eq "gaw.kr")	or	# Gawker
@@ -333,6 +355,7 @@ $unshort = sub{
 	    ($auth eq "nym.ag")	or	# New York Magazine
 	    ($auth eq "ofa.bo")	or
 	    ($auth eq "osf.to")	or	# Open Society Foundation
+	    ($auth eq "ovh.to")	or	# OVH telecom
 	    ($auth eq "owl.li")	or
 	    ($auth eq "pco.lt")	or
 	    ($auth eq "prn.to")	or	# PR News Wire
@@ -362,6 +385,7 @@ $unshort = sub{
 	    ($auth eq "tgr.ph")	or	# The Telegraph
 	    ($auth eq "tnw.co")	or	# TheNextWeb
 	    ($auth eq "tnw.to")	or	# TheNextWeb
+	    ($auth eq "tnw.me")	or	# TheNextWeb
 	    ($auth eq "tny.cz")	or
 	    ($auth eq "tny.gs")	or
 	    ($auth eq "tpm.ly")	or
@@ -371,10 +395,12 @@ $unshort = sub{
 	    ($auth eq "vsb.li")	or
 	    ($auth eq "vsb.ly")	or
 	    ($auth eq "wef.ch")	or	# WeForum
+	    ($auth eq "wrd.cm")	or	# Wired.com
 	    ($auth eq "wh.gov")	or	# Whitehouse.gov
 	    ($auth eq "wpo.st")	or	# Washington Post
 	    ($auth eq "zd.net")	or
 	    ($auth eq "1drv.ms")	or
+	    ($auth eq "1776.ly")	or
 	    ($auth eq "6sen.se")	or
 	    ($auth eq "atfp.co")	or
 	    ($auth eq "amba.to")	or	# Ameba.jp
@@ -408,6 +434,7 @@ $unshort = sub{
 	    ($auth eq "hptx.al")	or	# Hypertextual
 	    ($auth eq "huff.to")	or	# The Huffington Post
 	    ($auth eq "imrn.me")	or
+	    ($auth eq "itun.es")	or	# iTunes, shows long name of podcasts
 	    ($auth eq "josh.re")	or
 	    ($auth eq "jrnl.to")	or	# Powered by bit.ly
 	    ($auth eq "klou.tt")	or
@@ -416,6 +443,7 @@ $unshort = sub{
 	    ($auth eq "mdia.st")	or	# Mediaset (spanish TV station)
 	    ($auth eq "mirr.im")	or	# The Daily Mirror (UK newspaper)
 	    ($auth eq "miud.in")	or	($auth eq "redirect.miud.in")	or
+	    ($auth eq "mojo.ly")	or	# Mother Jones
 	    ($auth eq "monk.ly")	or
 	    ($auth eq "mrkt.ms")	or	# MarketMeSuite (SEO platform)
 	    ($auth eq "msft.it")	or	# Microsoft
@@ -424,8 +452,10 @@ $unshort = sub{
 	    ($auth eq "note.io")	or
 	    ($auth eq "noti.ca")	or
 	    ($auth eq "nydn.us")	or	# New York Daily News
+	    ($auth eq "nyer.cm")	or  # New Yorker
 	    ($auth eq "nyti.ms")	or  # New York Times
 	    ($auth eq "nzzl.me")	or
+	    ($auth eq "onvb.co")	or	# Venture Beat
 	    ($auth eq "pear.ly")	or
 	    ($auth eq "post.ly")	or	# Posterous
 	    ($auth eq "ppfr.it")	or
@@ -522,6 +552,7 @@ $unshort = sub{
 	    ($auth eq "binged.it")	or	# Microsoft goes Bing!. Bing!
 	    ($auth eq "bitly.com")	or
 	    ($auth eq "drudge.tw")	or
+	    ($auth eq "es.rt.com")	or
 	    ($auth eq "go.shr.lc")	or	# Short shareholic
 	    ($auth eq "interc.pt")	or
 	    ($auth eq "keruff.it")	or
@@ -549,6 +580,7 @@ $unshort = sub{
 	    ($auth eq "feedly.com")	or
 	    ($auth eq "go.usa.gov")	or
 	    ($auth eq "l.aunch.us")	or
+	    ($auth eq "lifehac.kr")	or	# Lifehacker
 	    ($auth eq "macrumo.rs")	or	# Mac Rumors
 	    ($auth eq "mitsmr.com")	or
 	    ($auth eq "oak.ctx.ly")	or
@@ -593,6 +625,7 @@ $unshort = sub{
 	    ($query =~ m#utm_source=# )	or	# Any URL from *any* server which contains "utm_source=" looks like a social SEO marketing campaign-speech-enabled linkification
 	    ($query =~ m#utm_medium=# )	or	# Any URL from *any* server which contains "utm_medium=" looks like a social SEO marketing campaign-speech-enabled linkification
 	    ($query =~ m#url=http# )	or	# Any URL from *any* server which contains "url=http" looks like a redirector
+	    ($query =~ m#redirect# )	or	# Any URL from *any* server which contains a "redirect*" parameter looks like a redirector
 	    ($query =~ m#^p=\d+$# )	or	# Any URL from *any* server which contains "p=1234" looks like a wordpress
 	    ($query =~ m#^\d+$# )	or	# Any URL from *any* server which is just numbers, high prob. it's a code for something else
 	    ($auth eq "www.guardian.co.uk" and $path =~ m#^/p/# )	or	# Guardian short links, e.g. http://www.guardian.co.uk/p/3fz77/tw
@@ -664,6 +697,7 @@ $unshort = sub{
 			(not $auth =~ m#blogspot.com$#) and	# blogspot.com always redirects to a nearby (geolocated) server
 			(not $auth eq "www.facebook.com") and	# facebook.com will redirect any page to fb.com/unsupportedbrowser due to user-agent
 			(not $auth eq "www.nytimes.com") and	# New York Times articles will only loop till a no cookies page.
+			(not $auth eq "www.elmundo.es") and	# El Mundo newspaper will only timeout and waste time
 			1
 			)
 		{
