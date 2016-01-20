@@ -165,6 +165,7 @@ $cleanup_url = sub{
 
             if ($name =~ m#_source$# or $name =~ m#_medium$# or $name =~ m#_term$# or $name =~ m#_content$# or $name =~ m#_campaign$# or $name =~ m#_mchannel$# or $name =~ m#_kwd$#
                 or ( $name eq "utm_cid")
+                or ( $name eq "cm_mmc")
                 or ( $name eq "tag" and $value eq "as.rss" )
                 or ( $name eq "ref" and $value eq "rss" )
                 or ( $name eq "ref" and $value eq "tw" )
@@ -185,7 +186,7 @@ $cleanup_url = sub{
                 or ( $name eq "ex_cid" and $value eq "story-twitter")
                 or ( $name eq "ocid" and $value eq "socialflow_twitter")
                 or ( $name eq "ocid" and $value eq "socialflow_facebook")
-                or ( $name eq "oc_src" and $value eq "social-sh")
+                or ( $name =~ m#_src$# and $value eq "social-sh")
                 or ( $name eq "soc_trk" and $value eq "tw")
                 or ( $name eq "a" and $value eq "socialmedia")	# In meetup.com links
                     )
@@ -212,6 +213,18 @@ $cleanup_url = sub{
 		}
 		
     }
+    
+    if ($path)
+    {
+		if ($auth eq "news.yahoo.com")
+		{
+			$path =~ s/;.*$//;	# Strip everything from the first ';' onwards.
+			
+			$url = uri_join($scheme, $auth, $path, $query, $frag);
+		}
+		
+    }    
+    
     
 #       # Dirty trick to prevent escaped = and & and # to be unescaped (and mess up the query string part) - escape them again!
 #       $url =~ s/%24/%2524/i;  # $
@@ -296,6 +309,7 @@ $unshort = sub{
 	    ($auth eq "wj.la")	or	# ABC7 News (washington)
 	    ($auth eq "wp.me")	or	# Wordpress
 	    ($auth eq "29g.us")	or
+	    ($auth eq "abr.ai")	or	# Abril.com.br, brazilian newspaper
 	    ($auth eq "adf.ly")	or
 	    ($auth eq "aka.ms")	or	# Microsoft's "Social eXperience Platform"
 	    ($auth eq "api.pw")	or	# Programmable Web
@@ -392,6 +406,7 @@ $unshort = sub{
 	    ($auth eq "tpt.to")	or
 	    ($auth eq "ur1.ca")	or
 	    ($auth eq "ver.ec")	or	# E-Cartelera (spanish tv&movies)
+	    ($auth eq "vkm.is")	or	# Verkami
 	    ($auth eq "vsb.li")	or
 	    ($auth eq "vsb.ly")	or
 	    ($auth eq "wef.ch")	or	# WeForum
@@ -437,6 +452,7 @@ $unshort = sub{
 	    ($auth eq "itun.es")	or	# iTunes, shows long name of podcasts
 	    ($auth eq "josh.re")	or
 	    ($auth eq "jrnl.to")	or	# Powered by bit.ly
+	    ($auth eq "klls.cr")	or	# KillScreen
 	    ($auth eq "klou.tt")	or
 	    ($auth eq "likr.es")	or	# Powered by TribApp
 	    ($auth eq "lnkd.in")	or	# Linkedin
@@ -570,6 +586,7 @@ $unshort = sub{
 	    ($auth eq "politi.co")	or	# Politico.com newspaper
 	    ($auth eq "s.hbr.org")	or
 	    ($auth eq "thebea.st")	or	# The Daily Beast
+	    ($auth eq "u.afp.com")	or
 	    ($auth eq "urlads.co")	or
 	    ($auth eq "washin.st")	or	# Washington institute
 	    ($auth eq "wlstrm.me")	or	# Jeff Walstrom
@@ -606,6 +623,7 @@ $unshort = sub{
 	    ($auth eq "on.natgeo.com")	or	# National Geographic
 	    ($auth eq "www.tumblr.com")	or
 	    ($auth eq "feeds.gawker.com")	or
+	    ($auth eq "cards.twitter.com")	or	# Et tu, twitter?
 	    ($auth eq "feeds.feedburner.com")	or
 	    ($auth eq "feedproxy.google.com")	or
 	    ($auth eq "www.pheedcontent.com")	or	# Oh, look, Imma l337 h4xx0r. Geez.
@@ -617,6 +635,7 @@ $unshort = sub{
 	    ($auth =~ m/^rss\./)	or	# Will this never end?
 	    ($auth =~ m/^rd\.yahoo\./)	or	# Yahoo feeds... *sigh*
 	    ($auth =~ m/^redirect\./)	or	# redirect.viglink.com and others
+	    ($auth =~ m/^go\./)	or
 	    ($auth =~ m#.tuu.gs$#)	or	# whatever.tuu.gs powered by Tweet User URL
 	    ($auth =~ m#.sharedby.co$#)	or	# whatever.sharedby.co
 	    ($auth eq "www.google.com" and $path eq "/url")	or	# I hate it when people paste URLs from the stupid google url tracker.
@@ -628,6 +647,7 @@ $unshort = sub{
 	    ($query =~ m#redirect# )	or	# Any URL from *any* server which contains a "redirect*" parameter looks like a redirector
 	    ($query =~ m#^p=\d+$# )	or	# Any URL from *any* server which contains "p=1234" looks like a wordpress
 	    ($query =~ m#^\d+$# )	or	# Any URL from *any* server which is just numbers, high prob. it's a code for something else
+	    ($path =~ m#^/p/# )	or	# Some generic wordpress shortener, I think.
 	    ($auth eq "www.guardian.co.uk" and $path =~ m#^/p/# )	or	# Guardian short links, e.g. http://www.guardian.co.uk/p/3fz77/tw
 	    ($auth eq "www.eldiario.es" and $path =~ m#^/_# )	or	# ElDiario short links, e.g. www.eldiario.es/_1b3454af
 	    ($auth eq "www.meneame.net" and $path =~ m#^/(.*\/)?go# )	or	# Menéame.net redirections (not posts, etc)
@@ -636,7 +656,11 @@ $unshort = sub{
 	{
 		$unshorting_method = "HEAD";	# For these servers, perform a HTTP HEAD request
 	}
-	elsif ($auth eq "po.st")
+	elsif ($auth eq "po.st" or
+	       $auth eq "Iad.bg" or
+	       $auth eq "iad.bg" or
+	       $auth eq "mwcb.in" or	# Mobile World Capital
+	       $auth eq "social.os.uk")
 	{
 		$unshorting_method = "GET";	# For these servers, perform a HTTP GET request, hope for a 30* header back. Use for shorteners that fail with HEAD requests.
 	}
@@ -694,10 +718,14 @@ $unshort = sub{
 			(not $auth eq "spoti.fi") and	# Full link doesn't add any info
 			(not $auth eq "4sq.com") and	# Full link doesn't add any info
 			(not $auth eq "flic.kr") and	# Full link doesn't add any info
+			(not $auth eq "untp.beer") and	# Full link doesn't add any info
 			(not $auth =~ m#blogspot.com$#) and	# blogspot.com always redirects to a nearby (geolocated) server
 			(not $auth eq "www.facebook.com") and	# facebook.com will redirect any page to fb.com/unsupportedbrowser due to user-agent
 			(not $auth eq "www.nytimes.com") and	# New York Times articles will only loop till a no cookies page.
 			(not $auth eq "www.elmundo.es") and	# El Mundo newspaper will only timeout and waste time
+			(not $auth eq "www.economist.com") and	# "You are banned from this site.  Please contact via a different client configuration if you believe that this is a mistake."
+			(not $auth eq "www.amazon.com") and	# 405 MethodNotAllowed
+			(not $auth eq "pbs.twimg.com") and	# Might trigger verbose errors if twitter is over capacity
 			1
 			)
 		{
