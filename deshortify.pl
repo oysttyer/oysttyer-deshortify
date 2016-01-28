@@ -204,7 +204,9 @@ $cleanup_url = sub{
     if ($frag)
     {
 		if ($auth eq "medium.com" or
-		    $auth eq "mashable.com"
+		    $auth eq "mashable.com" or
+		    $auth eq "www.larazon.es" or
+		    $frag =~ m#^\.#	# If the fragment starts with a dot then it's a JS tracker
 		    )
 		{
 			$frag = "";
@@ -274,357 +276,389 @@ $unshort = sub{
 	my $unshorting_regexp;
 	my $unshorting_override = 0;
 
-	# Gathered a few shorteners. Should not be considered as a comprehensive list, but it'll do.
-	if (($path =~ m#^/p/#)  or  # Generic short links
-	    ($auth eq "g.co")	or	# Google
-	    ($auth eq "j.mp")	or
-	    ($auth eq "q.gs")	or
-	    ($auth eq "n.pr")	or	# NPR, National Public Radio (USA)
-	    ($auth eq "t.co")	or	# twitter
-	    ($auth eq "v.gd")	or	# Ethical URL shortener by memset hosting
-	    ($auth eq "bv.ms")	or	# Bloomberg
-	    ($auth eq "cl.ly")	or
-	    ($auth eq "db.tt")	or
-	    ($auth eq "di.gg")	or
-	    ($auth eq "ds.io")	or
-	    ($auth eq "ed.lc")	or
-	    ($auth eq "es.pn")	or
-	    ($auth eq "fb.me")	or
-	    ($auth eq "fw.to")	or
-	    ($auth eq "ht.ly")	or
-	    ($auth eq "if.lc")	or
-	    ($auth eq "is.gd")	or
-	    ($auth eq "kl.am")	or
-	    ($auth eq "me.lt")	or
-	    ($auth eq "mf.tt")	or
-	    ($auth eq "om.ly")	or
-	    ($auth eq "ow.ly")	or
-# 	    ($auth eq "po.st")	or	# Doesn't allow HTTP HEAD requests, doing GET requests.
-	    ($auth eq "qr.ae")	or	# Quora
-	    ($auth eq "su.pr")	or
-	    ($auth eq "ti.me")	or
-	    ($auth eq "tl.gd")	or	# Twitlonger
-	    ($auth eq "to.ly")	or
-	    ($auth eq "tr.im")	or
-	    ($auth eq "wj.la")	or	# ABC7 News (washington)
-	    ($auth eq "wp.me")	or	# Wordpress
-	    ($auth eq "29g.us")	or
-	    ($auth eq "abr.ai")	or	# Abril.com.br, brazilian newspaper
-	    ($auth eq "adf.ly")	or
-	    ($auth eq "aka.ms")	or	# Microsoft's "Social eXperience Platform"
-	    ($auth eq "api.pw")	or	# Programmable Web
-	    ($auth eq "ara.tv")	or	# alarabiya.net
-	    ($auth eq "ars.to")	or	# Ars Tecnica
-	    ($auth eq "aol.it")	or	# AOL, America OnLine
-	    ($auth eq "awe.sm")	or
-	    ($auth eq "bbc.in")	or	# bbc.co.uk
-	    ($auth eq "bit.ly")	or
-	    ($auth eq "bsa.sc")	or	# British Science Association
-	    ($auth eq "cbc.sh")	or	# leads to cbc.ca. Congrats, four characters saved.
-	    ($auth eq "cdb.io")	or
-	    ($auth eq "cgd.to")	or
-	    ($auth eq "chn.ge")	or	# Change.org
-	    ($auth eq "cli.gs")	or
-	    ($auth eq "clp.im")	or	# Powered by auto-tweet
-	    ($auth eq "cor.to")	or
-	    ($auth eq "cos.as")	or
-	    ($auth eq "cot.ag")	or
-	    ($auth eq "cnn.it")	or
-	    ($auth eq "cur.lv")	or
-	    ($auth eq "del.ly")	or	# Powered by Sprinklr
-	    ($auth eq "dld.bz")	or
-	    ($auth eq "ebx.sh")	or
-	    ($auth eq "ebz.by")	or
-	    ($auth eq "esp.tl")	or	# Powered by bitly
-	    ($auth eq "fdl.me")	or
-	    ($auth eq "fon.gs")	or	# Fon Get Simple (By the fon.com guys)
-	    ($auth eq "for.tn")	or	# Fortune.com
-	    ($auth eq "fro.gd")	or	# Frog Design
-	    ($auth eq "fxn.ws")	or	# Fox News
-	    ($auth eq "gaw.kr")	or	# Gawker
-	    ($auth eq "git.io")	or	# GitHub
-	    ($auth eq "gkl.st")	or	# GeekList
-	    ($auth eq "glo.bo")	or	# Brazilian Globo
+	# Over time, I've gathered a few shorteners and common patterns for URL shorteners.
+	# Should not be considered as a comprehensive list, but it'll do.
+	
+	if ($auth eq "po.st" or
+	       $auth eq "Iad.bg" or
+	       $auth eq "iad.bg" or
+	       $auth eq "Nvda.ly" or	# Nvidia
+	       $auth eq "nvda.ly" or
+	       $auth eq "mwcb.in" or	# Mobile World Capital
+	       $auth eq "social.os.uk")
+	{
+		# For these servers, perform a HTTP GET request, hope for a 30* header back. Use for shorteners that fail with HEAD requests.
+		# This check is done before the normal shorteners, as these might share some matching regexp
+		$unshorting_method = "GET";	
+	}
+	elsif (($path =~ m#^/p/#)  or  # Generic short links
+	    ($path =~ m#^/r/# )	or	# Some generic reddit-like shortener, I think.
+	    ($path =~ m#^/go/#)	or	# OpenStreetMap-style
+	    ($path =~ m#^/[A-Za-z0-9]{2,12}$#)	or	# Only letters and numbers (no slashes, no dots)? Most likely a bit.ly-like shortener.
+	    ($path =~ m#^/[A-Za-z0-9\-]{10,16}$#)	or	# wp.me-like shorteners also use dashes
+	    ($path =~ m#^/[A-Za-z0-9\-_]{12,16}$#)	or	# Tumblr & co use a similar approach, but with dashes, lodashes and more characters.
+	    ($query =~ m#utm_source=# )	or	# Any URL from *any* server which contains "utm_source=" looks like a social SEO marketing campaign-speech-enabled linkification
+	    ($query =~ m#utm_medium=# )	or	# Any URL from *any* server which contains "utm_medium=" looks like a social SEO marketing campaign-speech-enabled linkification
+	    ($query =~ m#url=http# )	or	# Any URL from *any* server which contains "url=http" looks like a redirector
+	    ($query =~ m#redirect# )	or	# Any URL from *any* server which contains a "redirect*" parameter looks like a redirector
+	    ($query =~ m#^p=\d+$# )	or	# Any URL from *any* server which contains "p=1234" looks like a wordpress
+	    ($query =~ m#^\d+$# )	or	# Any URL from *any* server which is just numbers, high prob. it's a code for something else
+	    ($query =~ m#glink\.php# )	or	# Any URL from *any* server which contains 'glink.php'
+# 	    ($auth eq "g.co")	or	# Google
+# 	    ($auth eq "j.mp")	or
+# 	    ($auth eq "q.gs")	or
+# 	    ($auth eq "n.pr")	or	# NPR, National Public Radio (USA)
+# 	    ($auth eq "t.co")	or	# twitter
+# 	    ($auth eq "v.gd")	or	# Ethical URL shortener by memset hosting
+# 	    ($auth eq "bv.ms")	or	# Bloomberg
+# 	    ($auth eq "cl.ly")	or
+# 	    ($auth eq "db.tt")	or
+# 	    ($auth eq "di.gg")	or
+# 	    ($auth eq "ds.io")	or
+# 	    ($auth eq "ed.lc")	or
+# 	    ($auth eq "es.pn")	or
+# 	    ($auth eq "fb.me")	or
+# 	    ($auth eq "fw.to")	or
+# 	    ($auth eq "ht.ly")	or
+# 	    ($auth eq "if.lc")	or
+# 	    ($auth eq "is.gd")	or
+# 	    ($auth eq "kl.am")	or
+# 	    ($auth eq "me.lt")	or
+# 	    ($auth eq "mf.tt")	or
+# 	    ($auth eq "om.ly")	or
+# 	    ($auth eq "ow.ly")	or
+# # 	    ($auth eq "po.st")	or	# Doesn't allow HTTP HEAD requests, doing GET requests.
+# 	    ($auth eq "qr.ae")	or	# Quora
+# 	    ($auth eq "su.pr")	or
+# 	    ($auth eq "ti.me")	or
+# 	    ($auth eq "tl.gd")	or	# Twitlonger
+# 	    ($auth eq "to.ly")	or
+# 	    ($auth eq "tr.im")	or
+# 	    ($auth eq "wj.la")	or	# ABC7 News (washington)
+# 	    ($auth eq "wp.me")	or	# Wordpress
+# 	    ($auth eq "29g.us")	or
+# 	    ($auth eq "abr.ai")	or	# Abril.com.br, brazilian newspaper
+# 	    ($auth eq "adf.ly")	or
+# 	    ($auth eq "aka.ms")	or	# Microsoft's "Social eXperience Platform"
+# 	    ($auth eq "api.pw")	or	# Programmable Web
+# 	    ($auth eq "ara.tv")	or	# alarabiya.net
+# 	    ($auth eq "ars.to")	or	# Ars Tecnica
+# 	    ($auth eq "aol.it")	or	# AOL, America OnLine
+# 	    ($auth eq "awe.sm")	or
+# 	    ($auth eq "bbc.in")	or	# bbc.co.uk
+	    ($auth eq "bit.ly")	or	# Bitly usually fits the "16 numbers and letters" regexp, but also has longer vanity URLs.
+# 	    ($auth eq "bsa.sc")	or	# British Science Association
+# 	    ($auth eq "cbc.sh")	or	# leads to cbc.ca. Congrats, four characters saved.
+# 	    ($auth eq "cdb.io")	or
+# 	    ($auth eq "cgd.to")	or
+# 	    ($auth eq "chn.ge")	or	# Change.org
+# 	    ($auth eq "cli.gs")	or
+# 	    ($auth eq "clp.im")	or	# Powered by auto-tweet
+# 	    ($auth eq "cor.to")	or
+# 	    ($auth eq "cos.as")	or
+# 	    ($auth eq "cot.ag")	or
+# 	    ($auth eq "cnn.it")	or
+# 	    ($auth eq "cur.lv")	or
+# 	    ($auth eq "del.ly")	or	# Powered by Sprinklr
+# 	    ($auth eq "dld.bz")	or
+# 	    ($auth eq "ebx.sh")	or
+# 	    ($auth eq "ebz.by")	or
+# 	    ($auth eq "esp.tl")	or	# Powered by bitly
+# 	    ($auth eq "fdl.me")	or
+# 	    ($auth eq "fon.gs")	or	# Fon Get Simple (By the fon.com guys)
+# 	    ($auth eq "for.tn")	or	# Fortune.com
+# 	    ($auth eq "fro.gd")	or	# Frog Design
+# 	    ($auth eq "fxn.ws")	or	# Fox News
+# 	    ($auth eq "gaw.kr")	or	# Gawker
+# 	    ($auth eq "git.io")	or	# GitHub
+# 	    ($auth eq "gkl.st")	or	# GeekList
+# 	    ($auth eq "glo.bo")	or	# Brazilian Globo
 	    ($auth eq "goo.gl")	or	# Google
-	    ($auth eq "gph.is")	or	# Giphy
-	    ($auth eq "grn.bz")	or
-	    ($auth eq "gtg.lu")	or	# GetGlue (TV shows)
-	    ($auth eq "gu.com")	or	# The Guardian
-	    ($auth eq "htl.li")	or
-	    ($auth eq "htn.to")	or
-	    ($auth eq "hub.am")	or
-	    ($auth eq "ick.li")	or
-	    ($auth eq "ift.tt")	or	# If This Then That
-	    ($auth eq "ind.pn")	or	# The Independent.co.uk
-	    ($auth eq "kck.st")	or	# Kickstarter
-	    ($auth eq "kcy.me")	or	# Karmacracy
-	    ($auth eq "kng.ht")	or	# Knight Foundation
-	    ($auth eq "lat.ms")	or
-	    ($auth eq "mbl.mx")	or
-	    ($auth eq "mun.do")	or	# El Mundo
-	    ($auth eq "muo.fm")	or	# MakeUseOf
-	    ($auth eq "mzl.la")	or	# Mozilla
-	    ($auth eq "ngr.nu")	or	# Powered by bit.ly
-	    ($auth eq "nsm.me")	or
-	    ($auth eq "nym.ag")	or	# New York Magazine
-	    ($auth eq "ofa.bo")	or
-	    ($auth eq "osf.to")	or	# Open Society Foundation
-	    ($auth eq "ovh.to")	or	# OVH telecom
-	    ($auth eq "owl.li")	or
-	    ($auth eq "pco.lt")	or
-	    ($auth eq "prn.to")	or	# PR News Wire
-	    ($auth eq "r88.it")	or
-	    ($auth eq "rdd.me")	or
-	    ($auth eq "red.ht")	or
-	    ($auth eq "reg.cx")	or
-	    ($auth eq "rol.st")	or	# Rolling Stone magazine
-	    ($auth eq "rlu.ru")	or
-	    ($auth eq "rpx.me")	or	# http://janrain.com, social media company
-	    ($auth eq "rsc.li")	or
-	    ($auth eq "rww.to")	or
-	    ($auth eq "si1.es")	or
-	    ($auth eq "sbn.to")	or
-	    ($auth eq "sco.lt")	or
-	    ($auth eq "s.coop")	or	# Cooperative shortening
-	    ($auth eq "see.sc")	or
-	    ($auth eq "sfy.co")	or	# Storify
-	    ($auth eq "shr.gs")	or
-	    ($auth eq "smf.is")	or	# Summify
-	    ($auth eq "sns.mx")	or	# SNS analytics
-	    ($auth eq "soa.li")	or
-	    ($auth eq "soc.li")	or
-	    ($auth eq "spr.ly")	or	# Sprinklr
-	    ($auth eq "sta.mn")	or	# Stamen - Gotta love these guys' maps!
-	    ($auth eq "tgn.me")	or
-	    ($auth eq "tgr.ph")	or	# The Telegraph
-	    ($auth eq "tnw.co")	or	# TheNextWeb
-	    ($auth eq "tnw.to")	or	# TheNextWeb
-	    ($auth eq "tnw.me")	or	# TheNextWeb
-	    ($auth eq "tny.cz")	or
-	    ($auth eq "tny.gs")	or
-	    ($auth eq "tpm.ly")	or
-	    ($auth eq "tpt.to")	or
-	    ($auth eq "ur1.ca")	or
-	    ($auth eq "ver.ec")	or	# E-Cartelera (spanish tv&movies)
-	    ($auth eq "vkm.is")	or	# Verkami
-	    ($auth eq "vsb.li")	or
-	    ($auth eq "vsb.ly")	or
-	    ($auth eq "wef.ch")	or	# WeForum
-	    ($auth eq "wrd.cm")	or	# Wired.com
-	    ($auth eq "wh.gov")	or	# Whitehouse.gov
-	    ($auth eq "wpo.st")	or	# Washington Post
-	    ($auth eq "zd.net")	or
-	    ($auth eq "1drv.ms")	or
-	    ($auth eq "1776.ly")	or
-	    ($auth eq "6sen.se")	or
-	    ($auth eq "atfp.co")	or
-	    ($auth eq "amba.to")	or	# Ameba.jp
-	    ($auth eq "amzn.to")	or	# Amazon.com
-	    ($auth eq "apne.ws")	or	# AP news
-	    ($auth eq "arcg.is")	or	# ESRI's ArgCIS online
-	    ($auth eq "blgs.co")	or
-	    ($auth eq "buff.ly")	or
-	    ($auth eq "buzz.mw")	or
-	    ($auth eq "bzfd.it")	or	# Buzzfeed
-	    ($auth eq "cbsn.ws")	or	# CBS News
-	    ($auth eq "chzb.gr")	or	# Cheezburguer network
-	    ($auth eq "clic.bz")	or  # Powered by bit.ly
-	    ($auth eq "cnet.co")	or	# C-Net
-	    ($auth eq "cort.as")	or
-	    ($auth eq "cutv.ws")	or	# cultureunplugged.com
-	    ($auth eq "cyha.es")	or	# CyberHades.com
-	    ($auth eq "dell.to")	or	# Dell
-	    ($auth eq "dive.im")	or	# DiveMedia Solutions
-	    ($auth eq "disq.us")	or
-	    ($auth eq "dlvr.it")	or
-	    ($auth eq "econ.st")	or	# The Economist
-	    ($auth eq "engt.co")	or	# Engadget
-# 	    ($auth eq "flic.kr")	or	# Hhhmm, dunno is there's much use in de-shortening to flickr.com anyway.
-	    ($auth eq "flip.it")	or	# Flipboard
-	    ($auth eq "fork.ly")	or	# Forkly.com, although full URL doesn't add any useable info, much like foursquare
-	    ($auth eq "geog.gr")	or	# Geographical.co.uk
-	    ($auth eq "gen.cat")	or	# Generalitat Catalana (catalonian gov't)
-	    ($auth eq "hint.fm")	or
-	    ($auth eq "hubs.ly")	or
-	    ($auth eq "hptx.al")	or	# Hypertextual
-	    ($auth eq "huff.to")	or	# The Huffington Post
-	    ($auth eq "imrn.me")	or
-	    ($auth eq "itun.es")	or	# iTunes, shows long name of podcasts
-	    ($auth eq "josh.re")	or
-	    ($auth eq "jrnl.to")	or	# Powered by bit.ly
-	    ($auth eq "klls.cr")	or	# KillScreen
-	    ($auth eq "klou.tt")	or
-	    ($auth eq "likr.es")	or	# Powered by TribApp
-	    ($auth eq "lnkd.in")	or	# Linkedin
-	    ($auth eq "mdia.st")	or	# Mediaset (spanish TV station)
-	    ($auth eq "mirr.im")	or	# The Daily Mirror (UK newspaper)
-	    ($auth eq "miud.in")	or	($auth eq "redirect.miud.in")	or
-	    ($auth eq "mojo.ly")	or	# Mother Jones
-	    ($auth eq "monk.ly")	or
-	    ($auth eq "mrkt.ms")	or	# MarketMeSuite (SEO platform)
-	    ($auth eq "msft.it")	or	# Microsoft
-	    ($auth eq "nblo.gs")	or	# Networked Blogs
-	    ($auth eq "neow.in")	or	# NeoWin
-	    ($auth eq "note.io")	or
-	    ($auth eq "noti.ca")	or
-	    ($auth eq "nydn.us")	or	# New York Daily News
-	    ($auth eq "nyer.cm")	or  # New Yorker
-	    ($auth eq "nyti.ms")	or  # New York Times
-	    ($auth eq "nzzl.me")	or
-	    ($auth eq "onvb.co")	or	# Venture Beat
-	    ($auth eq "pear.ly")	or
-	    ($auth eq "post.ly")	or	# Posterous
-	    ($auth eq "ppfr.it")	or
-	    ($auth eq "prsm.tc")	or
-	    ($auth eq "qkme.me")	or	# QuickMeme
-	    ($auth eq "read.bi")	or	# Business Insider
-	    ($auth eq "ride.sc")	or	# RideScout
-	    ($auth eq "sbne.ws")	or	# SmartBrief News
-	    ($auth eq "snpy.tv")	or	# Snappy TV
-	    ($auth eq "stuf.in")	or	#
-	    ($auth eq "redd.it")	or	($auth eq "www.reddit.com" and $path =~ m#^/tb/#)   or  # Reddit
-	    ($auth eq "reut.rs")	or  # Reuters
-	    ($auth eq "seen.li")	or	($auth eq "seenthis.net" and $path eq "/index.php")	or # SeenThis, AKA http://seenthis.net/index.php?action=seenli&me=1ing
-	    ($auth eq "seod.co")	or
-	    ($auth eq "shar.es")	or
-	    ($auth eq "shrd.by")	or	# sharedby.co "Custom Engagement Bar and Analytics"
-	    ($auth eq "slnm.us")	or	# Salon
-	    ($auth eq "sml8.it")	or
-	    ($auth eq "smrt.in")	or	# Powered by bit.ly
-	    ($auth eq "snpy.tv")	or	# Snappy TV
-	    ($auth eq "tcrn.ch")	or	# Techcrunch
-	    ($auth eq "tiny.cc")	or
-	    ($auth eq "tuxi.tk")	or
-	    ($auth eq "trib.al")	or	($auth =~ m/\.trib\.al$/ )	or	# whatever.trib.al is done by SocialFlow
-	    ($auth eq "untp.it")	or	# Untap, via Bitly
-	    ($auth eq "usat.ly")	or	# USA Today
-	    ($auth eq "ves.cat")	or
-	    ($auth eq "vrge.co")	or	# The Verge
-	    ($auth eq "wapo.st")	or	# Washington Post
-	    ($auth eq "wrld.bg")	or	# World Bank Blogs
-	    ($auth eq "xfru.it")	or
-	    ($auth eq "xfru.it")	or	($auth eq "www.xfru.it")	or
-	    ($auth eq "xure.eu")	or
-	    ($auth eq "xurl.es")	or
-	    ($auth eq "yhoo.it")	or	# Yahoo
-	    ($auth eq "zite.to")	or
-	    ($auth eq "53eig.ht")	or ($auth eq "fivethirtyeight.com")	or
-	    ($auth eq "a.eoi.co")	or	# Escuela de Organización Industrial
-	    ($auth eq "a.eoi.es")	or	# Escuela de Organización Industrial
-	    ($auth eq "apr1.org")	or	# april.org (french something)
-	    ($auth eq "amzn.com")	or	# Amazon.com
-	    ($auth eq "baixa.ki")	or	# Baixa Ki, brazilian miscellanea agregator
-	    ($auth eq "bloom.bg")	or	# Bloomberg News
-	    ($auth eq "brook.gs")	or
-	    ($auth eq "buswk.co")	or	# Business Week
-	    ($auth eq "cultm.ac")	or	# Cult of Mac
-	    ($auth eq "egent.me")	or
-	    ($auth eq "elsab.me")	or
-# 	    ($auth eq "enwp.org")	or	# English Wikipedia. Not really worth deshortening.
-	    ($auth eq "flpbd.it")	or  # Flipboard
-	    ($auth eq "gizmo.do")	or	# Gizmodo
-	    ($auth eq "linkd.in")	or	# LinkedIn
-	    ($auth eq "l.r-g.me")	or	# Powered by bit.ly
-	    ($auth eq "maril.in")	or	# Marilink
-	    ($auth eq "mbist.ro")	or	# MediaBistro
-	    ($auth eq "mcmgz.in")	or	# Mac Magazine
-	    ($auth eq "meetu.ps")	or	($auth eq "www.meetup.com") or
-	    ($auth eq "menea.me")	or	# Menéame
-	    ($auth eq "mhoff.me")	or
-	    ($auth eq "migre.me")	or
-	    ($auth eq "mobro.co")	or	# Movember
-	    ($auth eq "mslnk.bz")	or
-	    ($auth eq "nokia.ly")	or
-	    ($auth eq "on.fb.me")	or
-	    ($auth eq "oreil.ly")	or
-	    ($auth eq "paill.fr")	or	# Powered by bit.ly
-	    ($auth eq "p.ost.im")	or
-	    ($auth eq "pulse.me")	or	($auth eq "www.pulse.me")	or
-	    ($auth eq "qwapo.es")	or
-	    ($auth eq "rafam.co")	or
-	    ($auth eq "refer.ly")	or
-	    ($auth eq "ripar.in")	or	# Riparian Data
-	    ($auth eq "secby.me")	or	# managed by bit.ly
-	    ($auth eq "short.ie")	or
-	    ($auth eq "short.to")	or
-	    ($auth eq "slate.me")	or	# The Slate
-	    ($auth eq "specc.ie")	or
-#	    ($auth eq "spoti.fi")	or	# Spotify. Not really worth deshortening as the full URL doesn't contain valuable info (track name, etc)
-	    ($auth eq "s.shr.lc")	or	# Shareaholic, bitly-powered
-	    ($auth eq "s.si.edu")	or	# Smithsonian
-	    ($auth eq "s.vfs.ro")	or
-	    ($auth eq "tbbhd.me")	or	# Powered by bit.ly
-	    ($auth eq "tmblr.co")	or	# Tumblr
-	    ($auth eq "thkpr.gs")	or	# ThinkProgress.org
-	    ($auth eq "thndr.me")	or	($auth eq "www.thunderclap.it") or
-	    ($auth eq "twurl.nl")	or
-	    ($auth eq "ustre.am")	or
-	    ($auth eq "w.abc.es")	or
-	    ($auth eq "wired.uk")	or
-	    ($auth eq "ymlp.com")	or
-#	    ($auth eq "youtu.be")	or	# This one is actually useful: no information is gained by de-shortening.
-	    ($auth eq "1.usa.gov")	or	# USA
-	    ($auth eq "atres.red")	or	# Atresmedia (antena 3 et al), spanish media group
-	    ($auth eq "binged.it")	or	# Microsoft goes Bing!. Bing!
-	    ($auth eq "bitly.com")	or
-	    ($auth eq "drudge.tw")	or
-	    ($auth eq "es.rt.com")	or
-	    ($auth eq "go.shr.lc")	or	# Short shareholic
-	    ($auth eq "interc.pt")	or
-	    ($auth eq "keruff.it")	or
-	    ($auth eq "mitsha.re")	or	# MIT share
-	    ($auth eq "mklnd.com")	or
-	    ($auth eq "mktfan.es")	or
-	    ($auth eq "m.safe.mn")	or
-	    ($auth eq "ondace.ro")	or
-	    ($auth eq "onforb.es")	or	# Forbes
-	    ($auth eq "onion.com")	or	# The Onion
-	    ($auth eq "on.ft.com")	or
-	    ($auth eq "on.rt.com")	or	# RT
-	    ($auth eq "pewrsr.ch")	or
-	    ($auth eq "pocket.co")	or	($auth eq "getpocket.com" and $path =~ m#^/s#)	or	# GetPocket, also known as ReadItLater
-	    ($auth eq "politi.co")	or	# Politico.com newspaper
-	    ($auth eq "s.hbr.org")	or
-	    ($auth eq "thebea.st")	or	# The Daily Beast
-	    ($auth eq "u.afp.com")	or
-	    ($auth eq "urlads.co")	or
-	    ($auth eq "washin.st")	or	# Washington institute
-	    ($auth eq "wlstrm.me")	or	# Jeff Walstrom
-	    ($auth eq "wwhts.com")	or  # WWWhatsNew, powered by bit.ly
-	    ($auth eq "dnlchw.net") or
-	    ($auth eq "eepurl.com")	or
-	    ($auth eq "elconfi.de")	or	# El Confidencial (spanish newspaper)
-	    ($auth eq "feedly.com")	or
-	    ($auth eq "go.usa.gov")	or
-	    ($auth eq "l.aunch.us")	or
-	    ($auth eq "lifehac.kr")	or	# Lifehacker
-	    ($auth eq "macrumo.rs")	or	# Mac Rumors
-	    ($auth eq "mitsmr.com")	or
-	    ($auth eq "oak.ctx.ly")	or
-	    ($auth eq "on.io9.com")	or	# IO9
-	    ($auth eq "on.mash.to")	or	# Mashable
-	    ($auth eq "on.tcrn.ch")	or	# TechCrunch
-	    ($auth eq "on.wsj.com")	or	# Wall Street Journal
-	    ($auth eq "recode.net")	or	($auth eq "on.recode.net")	or
-	    ($auth eq "theatln.tc")	or	# The Atlantic
-	    ($auth eq "the-fa.com")	or	# Powered by po.st
-	    ($auth eq "thewur.com")	or
-	    ($auth eq "to.pbs.org")	or	# PBS
-	    ($auth eq "tus140.com")	or
-	    ($auth eq "esriurl.com")	or	# ESRI
-	    ($auth eq "go.nasa.gov")	or	# NASA
-	    ($auth eq "GovAlert.eu")	or
-	    ($auth eq "smarturl.it")	or
-	    ($auth eq "tinyurl.com")	or
-	    ($auth eq "trackurl.it")	or
-	    ($auth eq "www.ara.cat")	or
-	    ($auth eq "hackaday.com")	or
-	    ($auth eq "r.spruse.com")	or	# Powered by bit.ly
-	    ($auth eq "on.natgeo.com")	or	# National Geographic
-	    ($auth eq "www.tumblr.com")	or
-	    ($auth eq "feeds.gawker.com")	or
+# 	    ($auth eq "gph.is")	or	# Giphy
+# 	    ($auth eq "grn.bz")	or
+# 	    ($auth eq "gtg.lu")	or	# GetGlue (TV shows)
+# 	    ($auth eq "gu.com")	or	# The Guardian
+# 	    ($auth eq "htl.li")	or
+# 	    ($auth eq "htn.to")	or
+# 	    ($auth eq "hub.am")	or
+# 	    ($auth eq "ick.li")	or
+# 	    ($auth eq "ift.tt")	or	# If This Then That
+# 	    ($auth eq "ind.pn")	or	# The Independent.co.uk
+# 	    ($auth eq "kck.st")	or	# Kickstarter
+# 	    ($auth eq "kcy.me")	or	# Karmacracy
+# 	    ($auth eq "kng.ht")	or	# Knight Foundation
+# 	    ($auth eq "lat.ms")	or
+# 	    ($auth eq "mbl.mx")	or
+# 	    ($auth eq "mun.do")	or	# El Mundo
+# 	    ($auth eq "muo.fm")	or	# MakeUseOf
+# 	    ($auth eq "mzl.la")	or	# Mozilla
+# 	    ($auth eq "ngr.nu")	or	# Powered by bit.ly
+# 	    ($auth eq "nsm.me")	or
+# 	    ($auth eq "nym.ag")	or	# New York Magazine
+# 	    ($auth eq "nyr.kr")	or	# New Yorker
+# 	    ($auth eq "ofa.bo")	or
+# 	    ($auth eq "osf.to")	or	# Open Society Foundation
+# 	    ($auth eq "ovh.to")	or	# OVH telecom
+# 	    ($auth eq "owl.li")	or
+# 	    ($auth eq "pco.lt")	or
+# 	    ($auth eq "prn.to")	or	# PR News Wire
+# 	    ($auth eq "r88.it")	or
+# 	    ($auth eq "rdd.me")	or
+# 	    ($auth eq "red.ht")	or
+# 	    ($auth eq "reg.cx")	or
+# 	    ($auth eq "rol.st")	or	# Rolling Stone magazine
+# 	    ($auth eq "rlu.ru")	or
+# 	    ($auth eq "rpx.me")	or	# http://janrain.com, social media company
+# 	    ($auth eq "rsc.li")	or
+# 	    ($auth eq "rww.to")	or
+# 	    ($auth eq "si1.es")	or
+# 	    ($auth eq "sbn.to")	or
+# 	    ($auth eq "sco.lt")	or
+# 	    ($auth eq "s.coop")	or	# Cooperative shortening
+# 	    ($auth eq "see.sc")	or
+# 	    ($auth eq "sfy.co")	or	# Storify
+# 	    ($auth eq "shr.gs")	or
+# 	    ($auth eq "smf.is")	or	# Summify
+# 	    ($auth eq "sns.mx")	or	# SNS analytics
+# 	    ($auth eq "soa.li")	or
+# 	    ($auth eq "soc.li")	or
+# 	    ($auth eq "spr.ly")	or	# Sprinklr
+# 	    ($auth eq "sta.mn")	or	# Stamen - Gotta love these guys' maps!
+# 	    ($auth eq "tgn.me")	or
+# 	    ($auth eq "tgr.ph")	or	# The Telegraph
+# 	    ($auth eq "tnw.co")	or	# TheNextWeb
+# 	    ($auth eq "tnw.to")	or	# TheNextWeb
+# 	    ($auth eq "tnw.me")	or	# TheNextWeb
+# 	    ($auth eq "tny.cz")	or
+# 	    ($auth eq "tny.gs")	or
+# 	    ($auth eq "tpm.ly")	or
+# 	    ($auth eq "tpt.to")	or
+# 	    ($auth eq "ur1.ca")	or
+# 	    ($auth eq "ver.ec")	or	# E-Cartelera (spanish tv&movies)
+# 	    ($auth eq "vkm.is")	or	# Verkami
+# 	    ($auth eq "vsb.li")	or
+# 	    ($auth eq "vsb.ly")	or
+# 	    ($auth eq "wef.ch")	or	# WeForum
+# 	    ($auth eq "wrd.cm")	or	# Wired.com
+# 	    ($auth eq "wh.gov")	or	# Whitehouse.gov
+# 	    ($auth eq "wpo.st")	or	# Washington Post
+# 	    ($auth eq "zd.net")	or
+# 	    ($auth eq "zpr.io")	or
+# 	    ($auth eq "1drv.ms")	or
+# 	    ($auth eq "1776.ly")	or
+# 	    ($auth eq "6sen.se")	or
+# 	    ($auth eq "atfp.co")	or
+# 	    ($auth eq "amba.to")	or	# Ameba.jp
+# 	    ($auth eq "amzn.to")	or	# Amazon.com
+# 	    ($auth eq "apne.ws")	or	# AP news
+# 	    ($auth eq "arcg.is")	or	# ESRI's ArgCIS online
+# 	    ($auth eq "bgcd.co")	or	# BugCrowd
+# 	    ($auth eq "blgs.co")	or
+# 	    ($auth eq "buff.ly")	or
+# 	    ($auth eq "buzz.mw")	or
+# 	    ($auth eq "bzfd.it")	or	# Buzzfeed
+# 	    ($auth eq "cbsn.ws")	or	# CBS News
+# 	    ($auth eq "chzb.gr")	or	# Cheezburguer network
+# 	    ($auth eq "clic.bz")	or  # Powered by bit.ly
+# 	    ($auth eq "cnet.co")	or	# C-Net
+# 	    ($auth eq "cort.as")	or
+# 	    ($auth eq "cutv.ws")	or	# cultureunplugged.com
+# 	    ($auth eq "cyha.es")	or	# CyberHades.com
+# 	    ($auth eq "dell.to")	or	# Dell
+# 	    ($auth eq "dive.im")	or	# DiveMedia Solutions
+# 	    ($auth eq "disq.us")	or
+# 	    ($auth eq "dlvr.it")	or
+# 	    ($auth eq "econ.st")	or	# The Economist
+# 	    ($auth eq "engt.co")	or	# Engadget
+# # 	    ($auth eq "flic.kr")	or	# Hhhmm, dunno is there's much use in de-shortening to flickr.com anyway.
+# 	    ($auth eq "flip.it")	or	# Flipboard
+# 	    ($auth eq "fork.ly")	or	# Forkly.com, although full URL doesn't add any useable info, much like foursquare
+# 	    ($auth eq "geog.gr")	or	# Geographical.co.uk
+# 	    ($auth eq "gen.cat")	or	# Generalitat Catalana (catalonian gov't)
+# 	    ($auth eq "hint.fm")	or
+# 	    ($auth eq "hubs.ly")	or
+# 	    ($auth eq "hptx.al")	or	# Hypertextual
+# 	    ($auth eq "huff.to")	or	# The Huffington Post
+# 	    ($auth eq "imrn.me")	or
+# 	    ($auth eq "itun.es")	or	# iTunes, shows long name of podcasts
+# 	    ($auth eq "josh.re")	or
+# 	    ($auth eq "jrnl.to")	or	# Powered by bit.ly
+# 	    ($auth eq "klls.cr")	or	# KillScreen
+# 	    ($auth eq "klou.tt")	or
+# 	    ($auth eq "likr.es")	or	# Powered by TribApp
+# 	    ($auth eq "lnkd.in")	or	# Linkedin
+# 	    ($auth eq "mdia.st")	or	# Mediaset (spanish TV station)
+# 	    ($auth eq "mirr.im")	or	# The Daily Mirror (UK newspaper)
+# 	    ($auth eq "miud.in")	or	($auth eq "redirect.miud.in")	or
+# 	    ($auth eq "mojo.ly")	or	# Mother Jones
+# 	    ($auth eq "monk.ly")	or
+# 	    ($auth eq "mrkt.ms")	or	# MarketMeSuite (SEO platform)
+# 	    ($auth eq "msft.it")	or	# Microsoft
+# 	    ($auth eq "nblo.gs")	or	# Networked Blogs
+# 	    ($auth eq "neow.in")	or	# NeoWin
+# 	    ($auth eq "note.io")	or
+# 	    ($auth eq "noti.ca")	or
+# 	    ($auth eq "nydn.us")	or	# New York Daily News
+# 	    ($auth eq "nyer.cm")	or  # New Yorker
+# 	    ($auth eq "nyti.ms")	or  # New York Times
+# 	    ($auth eq "nzzl.me")	or
+# 	    ($auth eq "onvb.co")	or	# Venture Beat
+# 	    ($auth eq "pear.ly")	or
+# 	    ($auth eq "post.ly")	or	# Posterous
+# 	    ($auth eq "ppfr.it")	or
+# 	    ($auth eq "prsm.tc")	or
+# 	    ($auth eq "qkme.me")	or	# QuickMeme
+# 	    ($auth eq "read.bi")	or	# Business Insider
+# 	    ($auth eq "ride.sc")	or	# RideScout
+# 	    ($auth eq "sbne.ws")	or	# SmartBrief News
+# 	    ($auth eq "snpy.tv")	or	# Snappy TV
+# 	    ($auth eq "stuf.in")	or	#
+# 	    ($auth eq "redd.it")	or	($auth eq "www.reddit.com" and $path =~ m#^/tb/#)   or  # Reddit
+# 	    ($auth eq "reut.rs")	or  # Reuters
+# 	    ($auth eq "seen.li")	or	($auth eq "seenthis.net" and $path eq "/index.php")	or # SeenThis, AKA http://seenthis.net/index.php?action=seenli&me=1ing
+# 	    ($auth eq "seod.co")	or
+# 	    ($auth eq "shar.es")	or
+# 	    ($auth eq "shrd.by")	or	# sharedby.co "Custom Engagement Bar and Analytics"
+# 	    ($auth eq "slnm.us")	or	# Salon
+# 	    ($auth eq "sml8.it")	or
+# 	    ($auth eq "smrt.in")	or	# Powered by bit.ly
+# 	    ($auth eq "snpy.tv")	or	# Snappy TV
+# 	    ($auth eq "tcrn.ch")	or	# Techcrunch
+# 	    ($auth eq "tiny.cc")	or
+# 	    ($auth eq "tuxi.tk")	or
+# 	    ($auth eq "trib.al")	or	($auth =~ m/\.trib\.al$/ )	or	# whatever.trib.al is done by SocialFlow
+# 	    ($auth eq "untp.it")	or	# Untap, via Bitly
+# 	    ($auth eq "usat.ly")	or	# USA Today
+# 	    ($auth eq "ves.cat")	or
+# 	    ($auth eq "vrge.co")	or	# The Verge
+# 	    ($auth eq "wapo.st")	or	# Washington Post
+# 	    ($auth eq "wrld.bg")	or	# World Bank Blogs
+# 	    ($auth eq "xfru.it")	or
+# 	    ($auth eq "xfru.it")	or	($auth eq "www.xfru.it")	or
+# 	    ($auth eq "xure.eu")	or
+# 	    ($auth eq "xurl.es")	or
+# 	    ($auth eq "yhoo.it")	or	# Yahoo
+# 	    ($auth eq "zite.to")	or
+# 	    ($auth eq "53eig.ht")	or ($auth eq "fivethirtyeight.com")	or
+# 	    ($auth eq "a.eoi.co")	or	# Escuela de Organización Industrial
+# 	    ($auth eq "a.eoi.es")	or	# Escuela de Organización Industrial
+# 	    ($auth eq "apr1.org")	or	# april.org (french something)
+# 	    ($auth eq "amzn.com")	or	# Amazon.com
+# 	    ($auth eq "baixa.ki")	or	# Baixa Ki, brazilian miscellanea agregator
+# 	    ($auth eq "bfpne.ws")	or	# Burlington Free Press
+# 	    ($auth eq "bloom.bg")	or	# Bloomberg News
+# 	    ($auth eq "brook.gs")	or
+# 	    ($auth eq "buswk.co")	or	# Business Week
+# 	    ($auth eq "cultm.ac")	or	# Cult of Mac
+# 	    ($auth eq "egent.me")	or
+# 	    ($auth eq "elsab.me")	or
+# # 	    ($auth eq "enwp.org")	or	# English Wikipedia. Not really worth deshortening.
+# 	    ($auth eq "flpbd.it")	or  # Flipboard
+# 	    ($auth eq "gizmo.do")	or	# Gizmodo
+# 	    ($auth eq "linkd.in")	or	# LinkedIn
+# 	    ($auth eq "l.r-g.me")	or	# Powered by bit.ly
+# 	    ($auth eq "maril.in")	or	# Marilink
+# 	    ($auth eq "mbist.ro")	or	# MediaBistro
+# 	    ($auth eq "mcmgz.in")	or	# Mac Magazine
+# 	    ($auth eq "meetu.ps")	or	($auth eq "www.meetup.com") or
+# 	    ($auth eq "menea.me")	or	# Menéame
+# 	    ($auth eq "mhoff.me")	or
+# 	    ($auth eq "migre.me")	or
+# 	    ($auth eq "mobro.co")	or	# Movember
+# 	    ($auth eq "mslnk.bz")	or
+# 	    ($auth eq "nokia.ly")	or
+# 	    ($auth eq "on.fb.me")	or
+# 	    ($auth eq "oreil.ly")	or
+# 	    ($auth eq "paill.fr")	or	# Powered by bit.ly
+# 	    ($auth eq "p.ost.im")	or
+# 	    ($auth eq "pulse.me")	or	($auth eq "www.pulse.me")	or
+# 	    ($auth eq "qwapo.es")	or
+# 	    ($auth eq "rafam.co")	or
+# 	    ($auth eq "refer.ly")	or
+# 	    ($auth eq "ripar.in")	or	# Riparian Data
+# 	    ($auth eq "secby.me")	or	# managed by bit.ly
+# 	    ($auth eq "short.ie")	or
+# 	    ($auth eq "short.to")	or
+# 	    ($auth eq "slate.me")	or	# The Slate
+# 	    ($auth eq "specc.ie")	or
+# #	    ($auth eq "spoti.fi")	or	# Spotify. Not really worth deshortening as the full URL doesn't contain valuable info (track name, etc)
+# 	    ($auth eq "s.shr.lc")	or	# Shareaholic, bitly-powered
+# 	    ($auth eq "s.si.edu")	or	# Smithsonian
+# 	    ($auth eq "s.vfs.ro")	or
+# 	    ($auth eq "tbbhd.me")	or	# Powered by bit.ly
+# 	    ($auth eq "tmblr.co")	or	# Tumblr
+# 	    ($auth eq "thkpr.gs")	or	# ThinkProgress.org
+# 	    ($auth eq "thndr.me")	or	($auth eq "www.thunderclap.it") or
+# 	    ($auth eq "twurl.nl")	or
+# 	    ($auth eq "ustre.am")	or
+# 	    ($auth eq "w.abc.es")	or
+# 	    ($auth eq "wired.uk")	or
+# 	    ($auth eq "ymlp.com")	or
+# #	    ($auth eq "youtu.be")	or	# This one is actually useful: no information is gained by de-shortening.
+# 	    ($auth eq "1.usa.gov")	or	# USA
+# 	    ($auth eq "atres.red")	or	# Atresmedia (antena 3 et al), spanish media group
+# 	    ($auth eq "binged.it")	or	# Microsoft goes Bing!. Bing!
+# 	    ($auth eq "bitly.com")	or
+# 	    ($auth eq "drudge.tw")	or
+# 	    ($auth eq "es.rt.com")	or
+# 	    ($auth eq "go.shr.lc")	or	# Short shareholic
+# 	    ($auth eq "interc.pt")	or
+# 	    ($auth eq "keruff.it")	or
+# 	    ($auth eq "mitsha.re")	or	# MIT share
+# 	    ($auth eq "mklnd.com")	or
+# 	    ($auth eq "mktfan.es")	or
+# 	    ($auth eq "m.safe.mn")	or
+# 	    ($auth eq "ondace.ro")	or
+# 	    ($auth eq "onforb.es")	or	# Forbes
+# 	    ($auth eq "onion.com")	or	# The Onion
+# 	    ($auth eq "on.ft.com")	or
+# 	    ($auth eq "on.rt.com")	or	# RT
+# 	    ($auth eq "pewrsr.ch")	or
+# 	    ($auth eq "pocket.co")	or	($auth eq "getpocket.com" and $path =~ m#^/s#)	or	# GetPocket, also known as ReadItLater
+# 	    ($auth eq "politi.co")	or	# Politico.com newspaper
+# 	    ($auth eq "s.hbr.org")	or
+# 	    ($auth eq "thebea.st")	or	# The Daily Beast
+# 	    ($auth eq "u.afp.com")	or
+# 	    ($auth eq "urlads.co")	or
+# 	    ($auth eq "washin.st")	or	# Washington institute
+# 	    ($auth eq "wlstrm.me")	or	# Jeff Walstrom
+# 	    ($auth eq "wwhts.com")	or  # WWWhatsNew, powered by bit.ly
+# 	    ($auth eq "dnlchw.net") or
+# 	    ($auth eq "eepurl.com")	or
+# 	    ($auth eq "elconfi.de")	or	# El Confidencial (spanish newspaper)
+# 	    ($auth eq "feedly.com")	or
+# 	    ($auth eq "go.usa.gov")	or
+# 	    ($auth eq "l.aunch.us")	or
+# 	    ($auth eq "lifehac.kr")	or	# Lifehacker
+# 	    ($auth eq "macrumo.rs")	or	# Mac Rumors
+# 	    ($auth eq "mitsmr.com")	or
+# 	    ($auth eq "oak.ctx.ly")	or
+# 	    ($auth eq "on.io9.com")	or	# IO9
+# 	    ($auth eq "on.mash.to")	or	# Mashable
+# 	    ($auth eq "on.tcrn.ch")	or	# TechCrunch
+# 	    ($auth eq "on.wsj.com")	or	# Wall Street Journal
+# 	    ($auth eq "recode.net")	or	($auth eq "on.recode.net")	or
+# 	    ($auth eq "theatln.tc")	or	# The Atlantic
+# 	    ($auth eq "the-fa.com")	or	# Powered by po.st
+# 	    ($auth eq "thewur.com")	or
+# 	    ($auth eq "to.pbs.org")	or	# PBS
+# 	    ($auth eq "tus140.com")	or
+# 	    ($auth eq "dx.plos.org")	or	($auth eq "www.plosone.org")	or	# PlosOne journals
+# 	    ($auth eq "esriurl.com")	or	# ESRI
+# 	    ($auth eq "go.nasa.gov")	or	# NASA
+# 	    ($auth eq "GovAlert.eu")	or
+# 	    ($auth eq "smarturl.it")	or
+# 	    ($auth eq "tinyurl.com")	or
+# 	    ($auth eq "trackurl.it")	or
+# 	    ($auth eq "www.ara.cat")	or
+# 	    ($auth eq "hackaday.com")	or
+# 	    ($auth eq "r.spruse.com")	or	# Powered by bit.ly
+# 	    ($auth eq "on.natgeo.com")	or	# National Geographic
+	    ($auth eq "www.meetup.com")	or	# Meetup adds some tracking crap.
+# 	    ($auth eq "www.tumblr.com")	or
+# 	    ($auth eq "feeds.gawker.com")	or
 	    ($auth eq "cards.twitter.com")	or	# Et tu, twitter?
-	    ($auth eq "feeds.feedburner.com")	or
+# 	    ($auth eq "feeds.feedburner.com")	or
 	    ($auth eq "feedproxy.google.com")	or
 	    ($auth eq "www.pheedcontent.com")	or	# Oh, look, Imma l337 h4xx0r. Geez.
 	    ($auth eq "click.linksynergy.com")	or
@@ -636,33 +670,20 @@ $unshort = sub{
 	    ($auth =~ m/^rd\.yahoo\./)	or	# Yahoo feeds... *sigh*
 	    ($auth =~ m/^redirect\./)	or	# redirect.viglink.com and others
 	    ($auth =~ m/^go\./)	or
+	    ($auth =~ m/^ww\./)	or	# More than one spanish media company uses ww.whatever as shorteners
 	    ($auth =~ m#.tuu.gs$#)	or	# whatever.tuu.gs powered by Tweet User URL
 	    ($auth =~ m#.sharedby.co$#)	or	# whatever.sharedby.co
 	    ($auth eq "www.google.com" and $path eq "/url")	or	# I hate it when people paste URLs from the stupid google url tracker.
 	    ($auth eq "traffic.shareaholic.com")	or	# Yet another traffic counter
 	    ($path =~ m#^/wf/click# )	or	# Any URL from *any* server which path starts with /wf/click?upm=foobar has been sent through SendGrid, which collects stats.
-	    ($query =~ m#utm_source=# )	or	# Any URL from *any* server which contains "utm_source=" looks like a social SEO marketing campaign-speech-enabled linkification
-	    ($query =~ m#utm_medium=# )	or	# Any URL from *any* server which contains "utm_medium=" looks like a social SEO marketing campaign-speech-enabled linkification
-	    ($query =~ m#url=http# )	or	# Any URL from *any* server which contains "url=http" looks like a redirector
-	    ($query =~ m#redirect# )	or	# Any URL from *any* server which contains a "redirect*" parameter looks like a redirector
-	    ($query =~ m#^p=\d+$# )	or	# Any URL from *any* server which contains "p=1234" looks like a wordpress
-	    ($query =~ m#^\d+$# )	or	# Any URL from *any* server which is just numbers, high prob. it's a code for something else
-	    ($path =~ m#^/p/# )	or	# Some generic wordpress shortener, I think.
-	    ($auth eq "www.guardian.co.uk" and $path =~ m#^/p/# )	or	# Guardian short links, e.g. http://www.guardian.co.uk/p/3fz77/tw
+# 	    ($auth eq "www.guardian.co.uk" and $path =~ m#^/p/# )	or	# Guardian short links, e.g. http://www.guardian.co.uk/p/3fz77/tw
 	    ($auth eq "www.eldiario.es" and $path =~ m#^/_# )	or	# ElDiario short links, e.g. www.eldiario.es/_1b3454af
 	    ($auth eq "www.meneame.net" and $path =~ m#^/(.*\/)?go# )	or	# Menéame.net redirections (not posts, etc)
-	    ($auth eq "www.stitcher.com" and $query =~ m#eid# )	# Stitcher podcasts if the podcast name is not shown
+	    ($auth eq "www.stitcher.com" and $query =~ m#eid# )	or	# Stitcher podcasts if the podcast name is not shown
+	    ($auth =~ m/\.link$/)	# I guess this new TLD will be mostly used for redirectors
 	    )
 	{
 		$unshorting_method = "HEAD";	# For these servers, perform a HTTP HEAD request
-	}
-	elsif ($auth eq "po.st" or
-	       $auth eq "Iad.bg" or
-	       $auth eq "iad.bg" or
-	       $auth eq "mwcb.in" or	# Mobile World Capital
-	       $auth eq "social.os.uk")
-	{
-		$unshorting_method = "GET";	# For these servers, perform a HTTP GET request, hope for a 30* header back. Use for shorteners that fail with HEAD requests.
 	}
 	elsif ($auth eq "www.snsanalytics.com")
 	{
@@ -713,7 +734,7 @@ $unshort = sub{
 	{
 		# Skip some well-known servers that are better to be left shortened.
 		if (
-			(not $auth =~ m#twitter.com$#) and	# Redirects to login and so on
+			(not $auth =~ m#twitter\.com$#) and	# Redirects to login and so on
 			(not $auth eq "youtu.be") and	# Full link doesn't add any info
 			(not $auth eq "spoti.fi") and	# Full link doesn't add any info
 			(not $auth eq "4sq.com") and	# Full link doesn't add any info
@@ -724,8 +745,11 @@ $unshort = sub{
 			(not $auth eq "www.nytimes.com") and	# New York Times articles will only loop till a no cookies page.
 			(not $auth eq "www.elmundo.es") and	# El Mundo newspaper will only timeout and waste time
 			(not $auth eq "www.economist.com") and	# "You are banned from this site.  Please contact via a different client configuration if you believe that this is a mistake."
-			(not $auth eq "www.amazon.com") and	# 405 MethodNotAllowed
+			(not $auth =~ m#"^www\.amazon\.#) and	# 405 MethodNotAllowed
 			(not $auth eq "pbs.twimg.com") and	# Might trigger verbose errors if twitter is over capacity
+			(not $auth eq "www.linkedin.com") and	# Redirects to login
+			(not $url =~ m#subscribe#) and	# Paywall (e.g. financial times)
+			(not $url =~ m#nocookie#) and
 			1
 			)
 		{
