@@ -210,24 +210,24 @@ $cleanup_url = sub{
 		    )
 		{
 			$frag = "";
-			
+
 			$url = uri_join($scheme, $auth, $path, $query, $frag);
 		}
-		
+
     }
-    
+
     if ($path)
     {
 		if ($auth eq "news.yahoo.com")
 		{
 			$path =~ s/;.*$//;	# Strip everything from the first ';' onwards.
-			
+
 			$url = uri_join($scheme, $auth, $path, $query, $frag);
 		}
-		
-    }    
-    
-    
+
+    }
+
+
 #       # Dirty trick to prevent escaped = and & and # to be unescaped (and mess up the query string part) - escape them again!
 #       $url =~ s/%24/%2524/i;  # $
 #       $url =~ s/%26/%2526/i;  # &
@@ -278,7 +278,7 @@ $unshort = sub{
 
 	# Over time, I've gathered a few shorteners and common patterns for URL shorteners.
 	# Should not be considered as a comprehensive list, but it'll do.
-	
+
 	if ($auth eq "po.st" or
 	       $auth eq "Iad.bg" or
 	       $auth eq "iad.bg" or
@@ -289,14 +289,16 @@ $unshort = sub{
 	{
 		# For these servers, perform a HTTP GET request, hope for a 30* header back. Use for shorteners that fail with HEAD requests.
 		# This check is done before the normal shorteners, as these might share some matching regexp
-		$unshorting_method = "GET";	
+		$unshorting_method = "GET";
 	}
-	elsif (($path =~ m#^/p/#)  or  # Generic short links
-	    ($path =~ m#^/r/# )	or	# Some generic reddit-like shortener, I think.
+	elsif (($path =~ m#^/[a-z]/#)  or  # Generic short links with one letter: /p/*, /r/*, /l/*, etc
 	    ($path =~ m#^/go/#)	or	# OpenStreetMap-style
 	    ($path =~ m#^/[A-Za-z0-9]{2,12}$#)	or	# Only letters and numbers (no slashes, no dots)? Most likely a bit.ly-like shortener.
-	    ($path =~ m#^/[A-Za-z0-9\-]{10,16}$#)	or	# wp.me-like shorteners also use dashes
+	    ($path =~ m#^/[A-Za-z0-9\-]{8,16}$#)	or	# wp.me-like shorteners also use dashes
 	    ($path =~ m#^/[A-Za-z0-9\-_]{12,16}$#)	or	# Tumblr & co use a similar approach, but with dashes, lodashes and more characters.
+	    ($path =~ m#^/shortcode/$#)	or	# RT.com & co
+	    ($path =~ m#^/_[0-9a-f]{2,12}$#)	or	# hexadecimal, ara.cat & co
+	    ($path =~ m#redirect# )	or	# TinyURL-like
 	    ($query =~ m#utm_source=# )	or	# Any URL from *any* server which contains "utm_source=" looks like a social SEO marketing campaign-speech-enabled linkification
 	    ($query =~ m#utm_medium=# )	or	# Any URL from *any* server which contains "utm_medium=" looks like a social SEO marketing campaign-speech-enabled linkification
 	    ($query =~ m#url=http# )	or	# Any URL from *any* server which contains "url=http" looks like a redirector
@@ -476,7 +478,7 @@ $unshort = sub{
 # 	    ($auth eq "geog.gr")	or	# Geographical.co.uk
 # 	    ($auth eq "gen.cat")	or	# Generalitat Catalana (catalonian gov't)
 # 	    ($auth eq "hint.fm")	or
-# 	    ($auth eq "hubs.ly")	or
+	    ($auth eq "hubs.ly")	or
 # 	    ($auth eq "hptx.al")	or	# Hypertextual
 # 	    ($auth eq "huff.to")	or	# The Huffington Post
 # 	    ($auth eq "imrn.me")	or
@@ -589,6 +591,7 @@ $unshort = sub{
 # 	    ($auth eq "tmblr.co")	or	# Tumblr
 # 	    ($auth eq "thkpr.gs")	or	# ThinkProgress.org
 # 	    ($auth eq "thndr.me")	or	($auth eq "www.thunderclap.it") or
+	    ($auth eq "trakt.tv")	or
 # 	    ($auth eq "twurl.nl")	or
 # 	    ($auth eq "ustre.am")	or
 # 	    ($auth eq "w.abc.es")	or
