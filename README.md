@@ -52,7 +52,14 @@ The following extra options are available:
 * `extpref_deshortifyalways=1`: By default, deshortify only works on a list of known URL shorteners. This means "shorteners that [Iván](http://twitter.com/RealIvanSanchez) has seen in his timeline". Setting this will cause deshortify to *always* follow a link, regardless of if the URL seems to come from a shortener. Be warned: this means one more HTTP request per URL, which means more lagginess.
 
 
-`deshortify` needs `libwww-perl` and `liburi-find-perl`. You can install them by running `cpan URI::Find`, `cpan URI::Split` and `cpan LWP::UserAgent`.
+`deshortify` needs `libwww-perl` and `liburi-find-perl`. You can install them by running `cpan URI::Find`, `cpan URI::Split` and `cpan LWP::UserAgent`. You may need to use `sudo cpan <module>` when installing cpan modules, depending on the setup of your local system.
+
+Some systems have SSL verification turned on but don't ship with the necessary CA cerificates for this to work.  If that's the case, you will also need to install the CA certificates by running `cpan Mozilla::CA`. You'll know if you're affected by this issue because you'll see errors such as the following when someone tweets an HTTPS URL:
+
+    *** Could not deshortify https://example.com/something further due to 500 Can't verify SSL peers without knowing which Certificate Authorities to trust
+
+
+
 
 
 ## Legalese
