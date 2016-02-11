@@ -651,7 +651,7 @@ $unshort = sub{
 # 	    ($auth eq "go.nasa.gov")	or	# NASA
 # 	    ($auth eq "GovAlert.eu")	or
 # 	    ($auth eq "smarturl.it")	or
-# 	    ($auth eq "tinyurl.com")	or
+	    ($auth eq "tinyurl.com")	or
 # 	    ($auth eq "trackurl.it")	or
 # 	    ($auth eq "www.ara.cat")	or
 # 	    ($auth eq "hackaday.com")	or
