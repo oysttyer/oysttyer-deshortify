@@ -299,13 +299,17 @@ $unshort = sub{
 	    ($path =~ m#^/shortcode/$#)	or	# RT.com & co
 	    ($path =~ m#^/_[0-9a-f]{2,12}$#)	or	# hexadecimal, ara.cat & co
 	    ($path =~ m#redirect# )	or	# TinyURL-like
+	    ($path =~ m#glink\.php# )	or	# Any URL from *any* server which contains 'glink.php'
+	    ($path =~ m#^/tc/#)	or	# SnappyTV-style
+	    ($path =~ m#url=http# )	or	# Any URL from *any* server which contains "url=http" looks like a redirector
+	    ($path =~ m#^/shortcode/#)	or	# rt.com-style
 	    ($query =~ m#utm_source=# )	or	# Any URL from *any* server which contains "utm_source=" looks like a social SEO marketing campaign-speech-enabled linkification
 	    ($query =~ m#utm_medium=# )	or	# Any URL from *any* server which contains "utm_medium=" looks like a social SEO marketing campaign-speech-enabled linkification
 	    ($query =~ m#url=http# )	or	# Any URL from *any* server which contains "url=http" looks like a redirector
 	    ($query =~ m#redirect# )	or	# Any URL from *any* server which contains a "redirect*" parameter looks like a redirector
+	    ($query =~ m#short=# )	or	# Flickr-style
 	    ($query =~ m#^p=\d+$# )	or	# Any URL from *any* server which contains "p=1234" looks like a wordpress
 	    ($query =~ m#^\d+$# )	or	# Any URL from *any* server which is just numbers, high prob. it's a code for something else
-	    ($query =~ m#glink\.php# )	or	# Any URL from *any* server which contains 'glink.php'
 # 	    ($auth eq "g.co")	or	# Google
 # 	    ($auth eq "j.mp")	or
 # 	    ($auth eq "q.gs")	or
@@ -488,7 +492,7 @@ $unshort = sub{
 # 	    ($auth eq "klls.cr")	or	# KillScreen
 # 	    ($auth eq "klou.tt")	or
 # 	    ($auth eq "likr.es")	or	# Powered by TribApp
-# 	    ($auth eq "lnkd.in")	or	# Linkedin
+	    ($auth eq "lnkd.in")	or	# Linkedin
 # 	    ($auth eq "mdia.st")	or	# Mediaset (spanish TV station)
 # 	    ($auth eq "mirr.im")	or	# The Daily Mirror (UK newspaper)
 # 	    ($auth eq "miud.in")	or	($auth eq "redirect.miud.in")	or
@@ -572,6 +576,7 @@ $unshort = sub{
 # 	    ($auth eq "on.fb.me")	or
 # 	    ($auth eq "oreil.ly")	or
 # 	    ($auth eq "paill.fr")	or	# Powered by bit.ly
+	    ($auth eq "phys.org")	or
 # 	    ($auth eq "p.ost.im")	or
 # 	    ($auth eq "pulse.me")	or	($auth eq "www.pulse.me")	or
 # 	    ($auth eq "qwapo.es")	or
@@ -700,6 +705,13 @@ $unshort = sub{
 	{
 		$unshorting_method = "REGEXP";	# For these servers, look for the first defined iframe
 		$unshorting_regexp = qr/<iframe .*src=["'](.*?)["'].*>/;
+		$unshorting_thing_were_looking_for = "iframe";
+	}
+	elsif (($auth eq "www.linkedin.com" and $path =~ m#^/pulse/# ))
+	{
+		# Linkedin's "pulse" use a weird iframe on a first step
+		$unshorting_method = "REGEXP";
+		$unshorting_regexp = qr/<iframe data-li-src=["'](.*?)["'].*>/;
 		$unshorting_thing_were_looking_for = "iframe";
 	}
 	elsif (($auth eq "bota.me")     or
