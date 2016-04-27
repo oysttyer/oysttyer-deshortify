@@ -169,6 +169,7 @@ $cleanup_url = sub{
                 or ( $name eq "tag" and $value eq "as.rss" )
                 or ( $name eq "ref" and $value eq "rss" )
                 or ( $name eq "ref" and $value eq "tw" )
+                or ( $name eq "ref" and $value eq "twtrec" )
                 or ( $name eq "id_externo_rsoc" and $value eq "TW_CM" )
                 or ( $name eq "newsfeed" and $value eq "true" )
                 or ( $name eq "spref" and $value eq "tw" )
@@ -189,6 +190,8 @@ $cleanup_url = sub{
                 or ( $name =~ m#_src$# and $value eq "social-sh")
                 or ( $name eq "soc_trk" and $value eq "tw")
                 or ( $name eq "a" and $value eq "socialmedia")	# In meetup.com links
+                or ( $name eq "CMP" and $value =~ m#^soc_#)	# In theguardian.com links
+                or ( $auth =~ m#elpais.com$# and $name eq "id_externo_rsoc" )   # El País (et al)
                     )
             {
                 my $expr = quotemeta("$name=$value");   # This prevents strings with "+" to be interpreted as part of the regexp
@@ -700,7 +703,8 @@ $unshort = sub{
 		$unshorting_thing_were_looking_for = "<input name='url'> field";
 	}
 	elsif (($auth =~ m#\.visibli\.com$# and $path =~ m#^/share# ) or	# http://whatever.visibli.com/share/abc123
-	       ($auth =~ m#\.visibli\.com$# and $path =~ m#^/links# )	# http://whatever.visibli.com/links/abc123
+	       ($auth =~ m#\.visibli\.com$# and $path =~ m#^/links# ) or	# http://whatever.visibli.com/links/abc123
+	       ($auth eq "linkis.com")	# http://linkis.com/www.dosmanzanas.com/mNyeR
 	      )
 	{
 		$unshorting_method = "REGEXP";	# For these servers, look for the first defined iframe
@@ -763,6 +767,7 @@ $unshort = sub{
 			(not $auth =~ m#"^www\.amazon\.#) and	# 405 MethodNotAllowed
 			(not $auth eq "pbs.twimg.com") and	# Might trigger verbose errors if twitter is over capacity
 			(not $auth eq "www.linkedin.com") and	# Redirects to login
+			(not $auth eq "session.wikispaces.com") and	# Infinite redirect loop with different URLs params each time
 			(not $url =~ m#subscribe#) and	# Paywall (e.g. financial times)
 			(not $url =~ m#nocookie#) and
 			1
