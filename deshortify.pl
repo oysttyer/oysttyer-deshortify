@@ -175,7 +175,7 @@ $cleanup_url = sub{
                 or ( $name eq "spref" and $value eq "tw" )
                 or ( $name eq "spref" and $value eq "fb" )
                 or ( $name eq "spref" and $value eq "gr" )
-                or ( $name eq "source" and $value eq "twitter" )
+                or ( $value eq "twitter" )
                 or ( $name eq "platform" and $value eq "hootsuite" )
                 or ( $name eq "mbid" and $value eq "social_retweet" )   # New Yorker et al
                 or ( $name eq "mbid" and $value eq "social_twitter" )   # New Yorker et al
