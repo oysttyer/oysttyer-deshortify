@@ -175,7 +175,8 @@ $cleanup_url = sub{
                 or ( $name eq "spref" and $value eq "tw" )
                 or ( $name eq "spref" and $value eq "fb" )
                 or ( $name eq "spref" and $value eq "gr" )
-                or ( $value eq "twitter" )
+                or ( $value =~ m#^twitter# )
+                or ( $value eq "share_btn_tw" )
                 or ( $name eq "platform" and $value eq "hootsuite" )
                 or ( $name eq "mbid" and $value eq "social_retweet" )   # New Yorker et al
                 or ( $name eq "mbid" and $value eq "social_twitter" )   # New Yorker et al
@@ -192,6 +193,8 @@ $cleanup_url = sub{
                 or ( $name eq "a" and $value eq "socialmedia")	# In meetup.com links
                 or ( $name eq "CMP" and $value =~ m#^soc_#)	# In theguardian.com links
                 or ( $auth =~ m#elpais.com$# and $name eq "id_externo_rsoc" )   # El País (et al)
+                or ( $auth =~ m#washingtonpost.com$# and $name eq "postshare" )   # Washington Post (et al)
+                or ( $auth =~ m#washingtonpost.com$# and $value eq "ss_tw-bottom" )   # Washington Post (et al)
                     )
             {
                 my $expr = quotemeta("$name=$value");   # This prevents strings with "+" to be interpreted as part of the regexp
@@ -759,9 +762,9 @@ $unshort = sub{
 			(not $auth eq "4sq.com") and	# Full link doesn't add any info
 			(not $auth eq "flic.kr") and	# Full link doesn't add any info
 			(not $auth eq "untp.beer") and	# Full link doesn't add any info
-			(not $auth =~ m#blogspot.com$#) and	# blogspot.com always redirects to a nearby (geolocated) server
+			(not $auth =~ m#blogspot\.[a-z]{2-3}$#) and	# blogspot.com always redirects to a nearby (geolocated) server
 			(not $auth eq "www.facebook.com") and	# facebook.com will redirect any page to fb.com/unsupportedbrowser due to user-agent
-			(not $auth eq "www.nytimes.com") and	# New York Times articles will only loop till a no cookies page.
+			(not $auth =~ m#\.nytimes\.com$#) and	# New York Times articles will only loop till a no cookies page.
 			(not $auth eq "www.elmundo.es") and	# El Mundo newspaper will only timeout and waste time
 			(not $auth eq "www.economist.com") and	# "You are banned from this site.  Please contact via a different client configuration if you believe that this is a mistake."
 			(not $auth =~ m#"^www\.amazon\.#) and	# 405 MethodNotAllowed
@@ -959,6 +962,7 @@ $dmhandle = $handle = sub {
 
 	# Yeah, a \n just before a http:// will mess things up.
 	$text =~ s/\\nhttp:\/\//\\n http:\/\//g;
+	$text =~ s/\\nhttps:\/\//\\n https:\/\//g;
 
 	# Any URIs you find, run them through unshort()...
 	my $finder = URI::Find->new(sub { &$unshort($_[0], $extpref_deshortifyretries, $extpref_deshortifyloopdetect) });
