@@ -190,6 +190,8 @@ $cleanup_url = sub{
                 or ( $name eq "ocid" and $value eq "socialflow_facebook")
                 or ( $name =~ m#_src$# and $value eq "social-sh")
                 or ( $name eq "soc_trk" and $value eq "tw")
+                or ( $name eq "ref" and $value eq "tw-share")
+                or ( $name eq "hootPostID")	# HootSuite stuff
                 or ( $name eq "a" and $value eq "socialmedia")	# In meetup.com links
                 or ( $name eq "CMP" and $value =~ m#^soc_#)	# In theguardian.com links
                 or ( $auth =~ m#elpais.com$# and $name eq "id_externo_rsoc" )   # El País (et al)
