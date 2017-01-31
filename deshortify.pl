@@ -804,8 +804,7 @@ $unshort = sub{
 			if (not $deshortify_cache{$original_url} eq $original_url)
 				{ return &$unshort($deshortify_cache{$original_url}, $extpref_deshortifyretries, $loop_detect -1); }
 			else
-				{ &$exception(33,"-- Detected cached link loop\n"); return &$cleanup_url($original_url);
-}
+				{ &$exception(33,"-- Detected cached link loop\n"); return &$cleanup_url($original_url); }
 		}
 
 # 		our $deshortify_cache_empty_counter;
@@ -826,6 +825,11 @@ $unshort = sub{
 		my $ua = LWP::UserAgent->new;
 		$ua->max_redirect( 0 );	# Don't redirect, just return the headers and look for a "Location:" one manually.
 		$ua->agent( "oysttyer $oysttyer_VERSION URL de-shortifier (" . $ua->agent() . ") (+https://github.com/oysttyer)" ); # Be good net citizens and say how nerdy we are and that we're a bot
+
+		if ($auth eq "fb.me") {
+			# Unless the host in question is fb.me, because they hijack the URL redirect based on user-agent
+			$ua->agent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/602.3.12 (KHTML, like Gecko) Version/10.0.2 Safari/602.3.12");
+		}
 
 		if ($extpref_deshortifyproxy) {	# If there's a proxy configured in .ttytterrc, use it no matter what.
 			$ua->proxy([qw/ http https /] => $extpref_deshortifyproxy);
